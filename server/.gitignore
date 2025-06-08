@@ -1,0 +1,107 @@
+# =============================
+# OS-specific files
+# =============================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+desktop.ini
+$RECYCLE.BIN/
+
+# =============================
+# Node.js
+# =============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+
+# =============================
+# Logs & Temp
+# =============================
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+
+# =============================
+# macOS system files
+# =============================
+.AppleDouble
+.LSOverride
+
+# =============================
+# Linux
+# =============================
+*~ 
+.cache
+Trash/
+
+# =============================
+# Windows
+# =============================
+*.lnk
+
+# =============================
+# IDEs and editors
+# =============================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# =============================
+# Environment files
+# =============================
+.env
+.env.*.local
+.env.local
+.env.test.local
+.env.development.local
+.env.production.local
+
+# =============================
+# Build output
+# =============================
+dist/
+build/
+out/
+.next/
+coverage/
+*.tsbuildinfo
+.cache/
+public/build/
+
+# =============================
+# Git
+# =============================
+.git/
+*.orig
+
+# =============================
+# Misc
+# =============================
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+*.gz
+*.zip
+*.tar
+*.rar
+
+# =============================
+# Custom
+# =============================
+firebase-debug.log
+firestore-debug.log
