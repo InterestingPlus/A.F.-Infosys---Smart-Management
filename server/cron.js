@@ -3,7 +3,7 @@ const https = require("https");
 
 const job = new cron.CronJob("*/14 * * * *", function () {
   https
-    .get("https://afinfosys-server.onrender.com", (res) => {
+    .get("https://a-f-infosys-smart-management.onrender.com", (res) => {
       if (res.statusCode === 200) console.log("GET Request sent Successfully!");
       else console.log("GET Request failed!", res.statusCode);
     })
