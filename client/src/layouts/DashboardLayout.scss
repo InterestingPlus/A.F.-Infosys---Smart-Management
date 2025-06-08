@@ -1,0 +1,140 @@
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  position: relative;
+
+  // Hamburger for mobile
+  .hamburger {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    cursor: pointer;
+
+    span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      margin: 5px 0;
+      border-radius: 2px;
+      background: rgb(16, 70, 70);
+    }
+  }
+
+  aside {
+    width: 20vw;
+    padding: 1rem;
+    background: rgb(16, 70, 70);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.425);
+    color: #fff;
+    transition: all 0.3s ease;
+    z-index: 1000;
+
+    .navigation {
+      h1 {
+        margin-bottom: 3rem;
+      }
+
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+
+        a {
+          color: #00ffea;
+          text-decoration: none;
+          padding: 0.8rem 0.5rem;
+          border-radius: 10px;
+
+          &:hover {
+            color: #ffffff;
+            background-color: rgba(8, 255, 214, 0.062);
+          }
+
+          &.active {
+            color: #ffffff;
+            background-color: rgba(8, 255, 214, 0.158);
+            border-bottom: 1px solid #ffffff3f;
+          }
+        }
+      }
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+
+      .profile-image {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        padding: 0.4rem 0.4rem;
+        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.178);
+
+        .avatar {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+        }
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 0.4rem 1rem;
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        background: red;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+  }
+
+  main {
+    flex: 1;
+    padding: 1.3rem;
+    background-color: var(--background);
+    overflow-y: auto;
+
+    width: 80vw;
+  }
+
+  // Responsive Styles
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .hamburger {
+      display: block;
+    }
+
+    aside {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 70vw;
+      height: 100vh;
+      background: rgb(16, 70, 70);
+      transition: all 0.3s ease-in-out;
+      padding: 2rem 1rem;
+
+      &.open {
+        left: 0;
+      }
+    }
+
+    main {
+      padding: 0.8rem;
+      padding-top: 4rem;
+      width: 100vw;
+    }
+  }
+}
