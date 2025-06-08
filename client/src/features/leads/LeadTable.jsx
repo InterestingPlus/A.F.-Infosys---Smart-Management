@@ -8,7 +8,7 @@ export default function LeadTable() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/leads");
+        const res = await fetch("https://afinfosys-server/api/leads");
         const data = await res.json();
         setLeads(data);
         setLoading(false);

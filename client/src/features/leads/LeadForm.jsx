@@ -34,7 +34,7 @@ export default function LeadForm() {
     const estimatedBill = Number(form.houseCount) * Number(form.pricePerHouse);
 
     try {
-      const res = await fetch("http://localhost:4000/api/leads", {
+      const res = await fetch("https://afinfosys-server/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, estimatedBill }),

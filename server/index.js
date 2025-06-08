@@ -6,9 +6,13 @@ import { connectDB } from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import inquiryRoutes from "./routes/inquiryRoutes.js";
 
+import job from "./cron";
+
 dotenv.config();
 
 const app = express();
+
+job.start();
 
 // Middleware
 app.use(cors());
