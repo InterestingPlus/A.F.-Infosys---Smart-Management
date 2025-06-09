@@ -8,13 +8,14 @@ export default function LeadDashboard() {
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+      <LeadTable />
+
+      <br />
       <div className="flex justify-between items-center mb-4">
         <button className="add-btn" onClick={() => navigate("/leads/new")}>
           Add Lead Inquiry Data
         </button>
       </div>
-
-      <LeadTable />
     </div>
   );
 }

@@ -25,7 +25,12 @@ export default function LeadTable() {
 
   return (
     <div className="lead-table-page">
-      <h2>Customer Lead Inqiry [ C. L. I.]</h2>
+      <h1>Report</h1>
+      <h2>
+        Customer Lead Inqiry [ C. L. I.] <br />
+        by - A.F. Infosys
+      </h2>
+
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -33,22 +38,22 @@ export default function LeadTable() {
           <table>
             <thead>
               <tr>
-                <th>Sr. No.</th>
-                <th>Customer Name</th>
-                <th>Mobile</th>
-                <th>WhatsApp</th>
-                <th>Village</th>
-                <th>House Count</th>
-                <th>Price/House</th>
-                <th>Estimated Bill</th>
-                <th>Inquiry For</th>
-                <th>Designation</th>
-                <th>District</th>
-                <th>Taluko</th>
-                <th>Reference</th>
-                <th>Call Date</th>
-                <th>Reminder</th>
-                <th>Remarks</th>
+                <th>1. Sr. No. ક્રમ</th>
+                <th>2. Customer Full Name / નામ</th>
+                <th>3. Mobile No. / મોબાઈલ નંબર</th>
+                <th>4. Whatsaap No. / વોટસેઅપ નબંર</th>
+                <th>5. Village / ગામ</th>
+                <th>6. ઘર/ ખાતા ગામના કેટલા છે</th>
+                <th>7. ભાવ ઘર/ખાતા દીઠ કહેલ</th>
+                <th>8. અંદાજીત બીલ રકમ રૂI.</th>
+                <th>9. કયુ કામ/વસ્તુ માટે ફોન કરેલ</th>
+                <th>10. Designation હોદ્દો TCM - SARAPNACH</th>
+                <th>11. Jilla / જિલ્લો</th>
+                <th>12. Taluko / તાલુકો</th>
+                <th>13. ગ્રાહક ક્યા રેફરન્સથી આવ્યા</th>
+                <th>14. Incuming call / કોલ આવ્યા તારીખ</th>
+                <th>15. Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
+                <th>16. Remark / રીમાર્કસ</th>
                 <th>Edit</th>
               </tr>
             </thead>
