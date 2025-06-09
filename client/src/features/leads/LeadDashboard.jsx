@@ -13,7 +13,7 @@ export default function LeadDashboard() {
       <br />
       <div className="flex justify-between items-center mb-4">
         <button className="add-btn" onClick={() => navigate("/leads/new")}>
-          Add Lead Inquiry Data
+          Lead Inquiry Form
         </button>
       </div>
     </div>
