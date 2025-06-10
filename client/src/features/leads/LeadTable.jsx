@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./LeadTable.scss";
+import apiPath from "../../isProduction";
 
 export default function LeadTable() {
   const [leads, setLeads] = useState([]);
@@ -8,9 +9,7 @@ export default function LeadTable() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const res = await fetch(
-          "https://a-f-infosys-smart-management.onrender.com/api/leads"
-        );
+        const res = await fetch(`${await apiPath()}/api/leads`);
         const data = await res.json();
         setLeads(data);
         setLoading(false);
@@ -55,6 +54,27 @@ export default function LeadTable() {
                 <th>15. Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
                 <th>16. Remark / રીમાર્કસ</th>
                 <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+              <tr>
+                <th>1. </th>
+                <th>2. </th>
+                <th>3. </th>
+                <th>4. </th>
+                <th>5. </th>
+                <th>6. </th>
+                <th>7. </th>
+                <th>8. </th>
+                <th>9. </th>
+                <th>10.</th>
+                <th>11.</th>
+                <th>12.</th>
+                <th>13.</th>
+                <th>14.</th>
+                <th>15.</th>
+                <th>16.</th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -79,7 +99,10 @@ export default function LeadTable() {
                   <td>{new Date(lead.reminderDate).toLocaleDateString()}</td>
                   <td>{lead.remarks}</td>
                   <td>
-                    <button>Edit</button>
+                    <button onClick={() => handleEdit(lead._id)}>Edit</button>
+                  </td>
+                  <td>
+                    <button>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -89,4 +112,14 @@ export default function LeadTable() {
       )}
     </div>
   );
+}
+
+async function handleEdit(leadId) {
+  try {
+    const res = await fetch(`${await apiPath()}/api/leads/${leadId}`);
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.error("Failed to fetch leads", err);
+  }
 }

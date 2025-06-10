@@ -18,3 +18,24 @@ export const getAllInquiries = async (req, res) => {
     res.status(500).json({ message: "Error fetching inquiries", error: err });
   }
 };
+
+export const editInquiry = async (req, res) => {
+  try {
+    const newInquiry = new Inquiry(req.body);
+    const saved = await newInquiry.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(500).json({ message: "Error saving inquiry", error: err });
+  }
+};
+
+export const getInquiry = async (req, res) => {
+  try {
+    const inquiryId = req.params.inquiryId;
+    const inquiry = await Inquiry.findById(inquiryId);
+
+    res.json(inquiry);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching inquiries", error: err });
+  }
+};

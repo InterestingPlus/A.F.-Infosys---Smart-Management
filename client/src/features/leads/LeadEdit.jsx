@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LeadForm.scss";
-import apiPath from "../../isProduction";
 
-export default function LeadForm() {
+export default function LeadEdit() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     customerName: "",
@@ -35,11 +34,14 @@ export default function LeadForm() {
     const estimatedBill = Number(form.houseCount) * Number(form.pricePerHouse);
 
     try {
-      const res = await fetch(`${await apiPath()}/api/leads`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, estimatedBill }),
-      });
+      const res = await fetch(
+        "https://a-f-infosys-smart-management.onrender.com/api/leads",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, estimatedBill }),
+        }
+      );
 
       if (res.ok) {
         alert("Lead added successfully!");

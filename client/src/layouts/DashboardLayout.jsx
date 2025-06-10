@@ -9,7 +9,7 @@ export default function DashboardLayout() {
     <div className="dashboard-layout">
       {/* Hamburger for Mobile */}
       <div
-        className="hamburger"
+        className={`hamburger ${isSidebarOpen ? "open" : ""}`}
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         <span />
