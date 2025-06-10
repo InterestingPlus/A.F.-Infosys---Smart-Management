@@ -55,7 +55,7 @@ export default function LeadForm() {
   return (
     <div className="lead-form-page">
       <h2 className="title">
-        1 - Customer Lead Inqiry [ C. L. I.] FORM
+        1 - Form (C.L.I.) Customer Lead Inqiry
         <br />
         પત્રક - 1 ઇન્કવાયરી યાદી - ફોર્મ
         <br />( ટેલીકોલર ડેટા એન્ટ્રી કરશે )
@@ -63,7 +63,7 @@ export default function LeadForm() {
       <form className="lead-form" onSubmit={handleSubmit}>
         <Input
           name="customerName"
-          label="1. Customer Full Name / નામ"
+          label="1 Customer Full Name / નામ"
           placeholder="Customer Name"
           value={form.customerName}
           onChange={handleChange}
@@ -71,7 +71,7 @@ export default function LeadForm() {
         />
         <Input
           name="mobileNumber"
-          label="2. Mobile No. / મોબાઈલ નંબર"
+          label="2 Mobile No. / મોબાઈલ નંબર"
           placeholder="Mobile Number"
           value={form.mobileNumber}
           onChange={handleChange}
@@ -79,7 +79,7 @@ export default function LeadForm() {
         />
         <Input
           name="whatsappNumber"
-          label="3. Whatsaap No. / વોટસેઅપ નબંર"
+          label="3 Whatsaap No. / વોટસેઅપ નબંર"
           placeholder="WhatsApp Number"
           value={form.whatsappNumber}
           onChange={handleChange}
@@ -87,7 +87,7 @@ export default function LeadForm() {
         />
         <Input
           name="district"
-          label="4. Jilla / જિલ્લો"
+          label="4 Jilla / જિલ્લો"
           placeholder="District"
           value={form.district}
           onChange={handleChange}
@@ -95,7 +95,7 @@ export default function LeadForm() {
         />
         <Input
           name="taluko"
-          label="5. Taluko / તાલુકો"
+          label="5 Taluko / તાલુકો"
           placeholder="Taluko"
           value={form.taluko}
           onChange={handleChange}
@@ -103,7 +103,7 @@ export default function LeadForm() {
         />
         <Input
           name="village"
-          label="6. Village / ગામ"
+          label="6 Village / ગામ"
           placeholder="Village"
           value={form.village}
           onChange={handleChange}
@@ -111,7 +111,7 @@ export default function LeadForm() {
         />
         <Input
           name="houseCount"
-          label="7. ઘર/ ખાતા ગામના કેટલા છે"
+          label="7 ઘર/ ખાતા ગામના કેટલા છે"
           placeholder="House Count"
           type="number"
           value={form.houseCount}
@@ -120,7 +120,7 @@ export default function LeadForm() {
         />
         <Input
           name="pricePerHouse"
-          label="8. ભાવ ઘર/ખાતા દીઠ કહેલ"
+          label="8 ભાવ ઘર/ખાતા દીઠ કહેલ"
           placeholder="Price per House"
           type="number"
           value={form.pricePerHouse}
@@ -129,7 +129,7 @@ export default function LeadForm() {
         />
         <Input
           name="estimatedBill"
-          label="9. અંદાજીત બીલ રકમ રૂI."
+          label="9 અંદાજીત બીલ રકમ રૂI."
           placeholder="Estimated Bill"
           type="number"
           value={
@@ -141,30 +141,22 @@ export default function LeadForm() {
         />
         <Input
           name="inquiryFor"
-          label="10. કયુ કામ/વસ્તુ માટે ફોન કરેલ"
+          label="10 કયુ કામ/વસ્તુ માટે ફોન કરેલ"
           placeholder="Inquiry For"
           value={form.inquiryFor}
           onChange={handleChange}
           required
         />
-        {/* <Input
-          name="designation"
-          label="11. Designation હોદ્દો TCM - SARAPNACH"
-          placeholder="Designation"
-          value={form.designation}
-          onChange={handleChange}
-          required
-        /> */}
         <Select
           name="designation"
-          label="11. Designation / હોદ્દો"
+          label="11 Designation / હોદ્દો"
           value={form.designation}
           onChange={handleChange}
           required
         />
         <Input
           name="referenceSource"
-          label="12. ગ્રાહક ક્યા રેફરન્સથી આવ્યા"
+          label="12 ગ્રાહક ક્યા રેફરન્સથી આવ્યા"
           placeholder="Reference Source"
           value={form.referenceSource}
           onChange={handleChange}
@@ -172,7 +164,7 @@ export default function LeadForm() {
         />
         <Input
           name="incomingCallDate"
-          label="13. Incuming call / કોલ આવ્યા તારીખ"
+          label="13 Incuming call / કોલ આવ્યા તારીખ"
           placeholder="Incoming Call Date"
           type="date"
           value={form.incomingCallDate}
@@ -181,7 +173,7 @@ export default function LeadForm() {
         />
         <Input
           name="reminderDate"
-          label="14. Reminder Call Date / કઈ તારીખે ફોન કરવો"
+          label="14 Reminder Call Date / કઈ તારીખે ફોન કરવો"
           placeholder="Reminder Date"
           type="date"
           value={form.reminderDate}
@@ -190,7 +182,7 @@ export default function LeadForm() {
         />
         <TextArea
           name="remarks"
-          label="15. Remark / રીમાર્કસ"
+          label="15 Remark / રીમાર્કસ"
           placeholder="Remarks"
           value={form.remarks}
           onChange={handleChange}

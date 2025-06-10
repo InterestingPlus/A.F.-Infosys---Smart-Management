@@ -46,12 +46,12 @@ export default function LeadTable() {
                 <th>અંદાજીત બીલ</th>
                 <th>કયુ કામ/વસ્તુ માટે ફોન કરેલ</th>
                 <th>Designation હોદ્દો TCM - SARAPNACH</th>
-                <th> Jilla / જિલ્લો</th>
-                <th> Taluko / તાલુકો</th>
-                <th> ગ્રાહક ક્યા રેફરન્સથી આવ્યા</th>
-                <th> Incuming call / કોલ આવ્યા તારીખ</th>
-                <th> Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
-                <th> Remark / રીમાર્કસ</th>
+                <th>Jilla / જિલ્લો</th>
+                <th>Taluko / તાલુકો</th>
+                <th>ગ્રાહક ક્યા રેફરન્સથી આવ્યા</th>
+                <th>Incuming call / કોલ આવ્યા તારીખ</th>
+                <th>Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
+                <th>Remark / રીમાર્કસ</th>
                 <th>Edit</th>
                 <th>Delete</th>
               </tr>
