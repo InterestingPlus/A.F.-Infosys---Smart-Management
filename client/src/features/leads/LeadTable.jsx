@@ -38,7 +38,7 @@ export default function LeadTable() {
             <thead>
               <tr>
                 <th>Sr. No. ક્રમ</th>
-                <th>Customer Full Name / નામ</th>
+                <th>Customer Full Name / ગ્રાહકનું નામ</th>
                 <th>Mobile No. / મોબાઈલ નંબર</th>
                 <th>Whatsaap No. / વોટસેઅપ નબંર</th>
                 <th>Village / ગામ</th>
