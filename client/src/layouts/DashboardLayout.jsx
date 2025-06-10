@@ -5,6 +5,14 @@ import "./DashboardLayout.scss";
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [openMenu, setOpenMenu] = useState(null);
+
+  const menuItems = [
+    { label: "Lead Inquiry", base: "/leads" },
+    { label: "Customer List", base: "/customers" },
+    { label: "Order Valuation", base: "/orders" },
+  ];
+
   return (
     <div className="dashboard-layout">
       {/* Hamburger for Mobile */}
@@ -22,27 +30,34 @@ export default function DashboardLayout() {
         <div className="navigation">
           <h1 className="text-2xl font-bold mb-6">A.F. Infosys</h1>
           <nav className="flex flex-col gap-4">
-            <NavLink
-              to="/leads"
-              className="hover:underline"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              Lead Inquiry
-            </NavLink>
-            <NavLink
-              to="/customers"
-              className="hover:underline"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              Customer List
-            </NavLink>
-            <NavLink
-              to="/orders"
-              className="hover:underline"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              Order Valuation
-            </NavLink>
+            {menuItems.map(({ label, base }) => (
+              <div key={base}>
+                <div
+                  className="main-link"
+                  onClick={() => setOpenMenu(openMenu === base ? null : base)}
+                >
+                  {label}
+                </div>
+                {openMenu === base && (
+                  <div className="sub-links">
+                    <NavLink
+                      to={`${base}/report`}
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Report
+                    </NavLink>
+                    <NavLink
+                      to={`${base}/form`}
+                      cclassName={({ isActive }) => (isActive ? "active" : "")}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Form
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+            ))}
           </nav>
         </div>
         <div className="profile">

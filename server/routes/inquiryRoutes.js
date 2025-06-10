@@ -4,6 +4,7 @@ import {
   getAllInquiries,
   getInquiry,
   editInquiry,
+  deleteInquiry,
 } from "../controllers/inquiryController.js";
 
 const router = express.Router();
@@ -11,7 +12,8 @@ const router = express.Router();
 router.post("/", createInquiry);
 router.get("/", getAllInquiries);
 
-router.get("/:inquiryId", getInquiry);
-// router.post("/edit", editInquiry);
+router.get("/lead/:id", getInquiry);
+router.put("/edit/:id", editInquiry);
+router.delete("/delete/:id", deleteInquiry);
 
 export default router;

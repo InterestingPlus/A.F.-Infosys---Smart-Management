@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./LeadTable.scss";
 import apiPath from "../../isProduction";
+import { useNavigate } from "react-router-dom";
 
 export default function LeadTable() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -21,6 +23,25 @@ export default function LeadTable() {
 
     fetchLeads();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this lead?")) return;
+
+    try {
+      const res = await fetch(`${await apiPath()}/api/leads/delete/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        alert("Lead deleted!");
+        setLeads(leads.filter((lead) => lead._id !== id)); // Optimistic UI
+      } else {
+        alert("Failed to delete lead.");
+      }
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+    }
+  };
 
   return (
     <div className="lead-table-page">
@@ -98,10 +119,17 @@ export default function LeadTable() {
                   <td>{new Date(lead.reminderDate).toLocaleDateString()}</td>
                   <td>{lead.remarks}</td>
                   <td>
-                    <button onClick={() => handleEdit(lead._id)}>Edit</button>
+                    <button
+                      onClick={() => navigate(`/leads/edit/${lead._id}`)}
+                      id="edit"
+                    >
+                      Edit
+                    </button>
                   </td>
                   <td>
-                    <button>Delete</button>
+                    <button onClick={() => handleDelete(lead._id)} id="delete">
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -111,14 +139,4 @@ export default function LeadTable() {
       )}
     </div>
   );
-}
-
-async function handleEdit(leadId) {
-  try {
-    const res = await fetch(`${await apiPath()}/api/leads/${leadId}`);
-    const data = await res.json();
-    console.log(data);
-  } catch (err) {
-    console.error("Failed to fetch leads", err);
-  }
 }

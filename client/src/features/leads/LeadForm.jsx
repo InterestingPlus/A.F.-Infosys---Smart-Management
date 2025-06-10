@@ -43,7 +43,7 @@ export default function LeadForm() {
 
       if (res.ok) {
         alert("Lead added successfully!");
-        navigate("/leads");
+        navigate("/leads/report");
       } else {
         alert("Failed to add lead");
       }
@@ -116,6 +116,8 @@ export default function LeadForm() {
           type="number"
           value={form.houseCount}
           onChange={handleChange}
+          minValue={1}
+          maxValue={10000}
           required
         />
         <Input
@@ -125,6 +127,8 @@ export default function LeadForm() {
           type="number"
           value={form.pricePerHouse}
           onChange={handleChange}
+          minValue={1}
+          maxValue={500}
           required
         />
         <Input
@@ -195,12 +199,12 @@ export default function LeadForm() {
           <button
             type="button"
             className="cancel"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/leads/report")}
           >
             Cancel
           </button>
           <button type="submit" className="submit">
-            Save
+            Add
           </button>
         </div>
       </form>
@@ -216,6 +220,9 @@ function Input({
   type = "text",
   required,
   placeholder,
+
+  minValue,
+  maxValue,
 }) {
   return (
     <div className="form-group">
@@ -228,6 +235,8 @@ function Input({
         onChange={onChange}
         required={required}
         placeholder={placeholder}
+        {...(minValue !== undefined ? { min: minValue } : {})}
+        {...(maxValue !== undefined ? { max: maxValue } : {})}
       />
     </div>
   );

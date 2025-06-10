@@ -141,3 +141,111 @@
     }
   }
 }
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  background-color: #1a202c; // dark background
+
+  aside {
+    width: 260px;
+    background-color: #2d3748;
+    color: #edf2f7;
+    padding: 1.5rem 1rem;
+    transition: transform 0.3s ease;
+    z-index: 100;
+    // position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+      transform: translateX(-100%);
+      &.open {
+        transform: translateX(0);
+      }
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #ffffff;
+    }
+
+    .navigation {
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        > div {
+          .main-link {
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+
+            &:hover {
+              background-color: #4a5568;
+            }
+          }
+
+          .sub-links {
+            margin-left: 1rem;
+            margin-top: 0.3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: max-height 0.3s ease;
+
+            a {
+              font-size: 0.9rem;
+              padding: 0.3rem 0.5rem;
+              border-radius: 4px;
+              color: #cbd5e0;
+
+              &:hover {
+                background-color: #4a5568;
+                color: #ffffff;
+              }
+
+              &.active {
+                background-color: #2b6cb0;
+                color: #ffffff;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 1.5rem;
+    background-color: #f7fafc;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+      margin-left: 0;
+    }
+  }
+
+  .mobile-toggle {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 1.5rem;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 150;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+}

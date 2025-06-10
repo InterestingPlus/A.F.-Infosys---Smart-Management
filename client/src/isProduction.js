@@ -13,14 +13,9 @@ async function apiPath() {
     });
 
   if (isProduction) {
-    // return "https://hms-backend-tr2u.onrender.com";
-    // return "https://hms-backend-production-7d9d.up.railway.app"; Jatin
-    //  https://mediconnect-hms-backend-production.up.railway.app; Piyush
-
     return url;
   } else {
     return "http://localhost:4000";
-    // return "http://192.168.129.169:4444";
   }
 }
 
