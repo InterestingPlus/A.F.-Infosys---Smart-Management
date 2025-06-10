@@ -24,10 +24,11 @@ export default function LeadTable() {
 
   return (
     <div className="lead-table-page">
-      <h1>Report</h1>
+      <h1>C.L.I. Report</h1>
       <h2>
-        Customer Lead Inqiry [ C. L. I.] <br />
-        by - A.F. Infosys
+        Customer Lead Inqiry
+        <br />
+        By - A.F. Infosys
       </h2>
 
       {loading ? (
