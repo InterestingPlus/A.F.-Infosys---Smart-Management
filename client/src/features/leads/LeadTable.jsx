@@ -37,22 +37,22 @@ export default function LeadTable() {
           <table>
             <thead>
               <tr>
-                <th>1. Sr. No. ક્રમ</th>
-                <th>2. Customer Full Name / નામ</th>
-                <th>3. Mobile No. / મોબાઈલ નંબર</th>
-                <th>4. Whatsaap No. / વોટસેઅપ નબંર</th>
-                <th>5. Village / ગામ</th>
-                <th>6. ઘર/ ખાતા ગામના કેટલા છે</th>
-                <th>7. ભાવ ઘર/ખાતા દીઠ કહેલ</th>
-                <th>8. અંદાજીત બીલ રકમ રૂI.</th>
-                <th>9. કયુ કામ/વસ્તુ માટે ફોન કરેલ</th>
-                <th>10. Designation હોદ્દો TCM - SARAPNACH</th>
-                <th>11. Jilla / જિલ્લો</th>
-                <th>12. Taluko / તાલુકો</th>
-                <th>13. ગ્રાહક ક્યા રેફરન્સથી આવ્યા</th>
-                <th>14. Incuming call / કોલ આવ્યા તારીખ</th>
-                <th>15. Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
-                <th>16. Remark / રીમાર્કસ</th>
+                <th>Sr. No. ક્રમ</th>
+                <th>Customer Full Name / નામ</th>
+                <th>Mobile No. / મોબાઈલ નંબર</th>
+                <th>Whatsaap No. / વોટસેઅપ નબંર</th>
+                <th>Village / ગામ</th>
+                <th>ઘર/ ખાતા</th>
+                <th>ભાવ ઘર/ખાતા દીઠ</th>
+                <th>અંદાજીત બીલ</th>
+                <th>કયુ કામ/વસ્તુ માટે ફોન કરેલ</th>
+                <th>Designation હોદ્દો TCM - SARAPNACH</th>
+                <th> Jilla / જિલ્લો</th>
+                <th> Taluko / તાલુકો</th>
+                <th> ગ્રાહક ક્યા રેફરન્સથી આવ્યા</th>
+                <th> Incuming call / કોલ આવ્યા તારીખ</th>
+                <th> Reminder Call Date / કઈ તારીખે ફોન કરવો</th>
+                <th> Remark / રીમાર્કસ</th>
                 <th>Edit</th>
                 <th>Delete</th>
               </tr>
