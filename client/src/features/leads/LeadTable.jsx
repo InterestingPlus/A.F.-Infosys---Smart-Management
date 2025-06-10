@@ -56,7 +56,7 @@ export default function LeadTable() {
                 <th>Edit</th>
                 <th>Delete</th>
               </tr>
-              <tr>
+              <tr className="index">
                 <th>1. </th>
                 <th>2. </th>
                 <th>3. </th>
