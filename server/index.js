@@ -22,6 +22,9 @@ app.use(express.json());
 connectDB();
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("A.F. Infosys Smart Management CRM, Server is Running!");
+});
 app.use("/api/users", userRoutes);
 app.use("/api/leads", inquiryRoutes);
 
