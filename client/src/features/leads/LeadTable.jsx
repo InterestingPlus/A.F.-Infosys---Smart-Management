@@ -24,7 +24,9 @@ export default function LeadTable() {
 
   return (
     <div className="lead-table-page">
-      <h1>Report (C.L.I.) - Customer Lead Inqiry</h1>
+      <h1>
+        Report (C.L.I.) <span>Customer Lead Inqiry</span>
+      </h1>
       <h2>By - A.F. Infosys</h2>
 
       {loading ? (

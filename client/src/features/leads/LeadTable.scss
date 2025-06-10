@@ -4,6 +4,12 @@
   height: 100%;
   overflow-x: auto;
 
+  h1 {
+    span {
+      color: var(--text-dark);
+    }
+  }
+
   h2 {
     font-size: 1.8rem;
     color: var(--text-dark);
