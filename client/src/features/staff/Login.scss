@@ -1,4 +1,5 @@
-.login-page {
+.login-page,
+.register-page {
   min-height: 100vh;
   background: linear-gradient(to right, #96a4cc, #ffab9c);
   display: flex;
@@ -7,7 +8,8 @@
   padding: 2rem;
   font-family: "Segoe UI", sans-serif;
 
-  .login-box {
+  .login-box,
+  .register-box {
     background: #ffffff;
     padding: 2.5rem 3rem;
     border-radius: 12px;
@@ -60,7 +62,15 @@
         &:hover {
           background-color: #3a78c2;
         }
+
+        &.view-btn {
+          background: #ffb158;
+        }
       }
     }
   }
+}
+
+.register-page {
+  background: transparent;
 }

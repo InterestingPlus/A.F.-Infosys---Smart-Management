@@ -62,6 +62,16 @@ export default function DashboardLayout() {
                 )}
               </div>
             ))}
+
+            {user.role === "owner" && (
+              <NavLink
+                to={`/staff`}
+                cclassName={({ isActive }) => (isActive ? "active" : "")}
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                Manage Staff
+              </NavLink>
+            )}
           </nav>
         </div>
         <div className="profile">
