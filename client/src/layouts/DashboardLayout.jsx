@@ -1,11 +1,15 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
 import "./DashboardLayout.scss";
+import { useAuth } from "../config/AuthContext";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [openMenu, setOpenMenu] = useState(null);
+
+  const { logout, user } = useAuth();
+  console.log(user);
 
   const menuItems = [
     { label: "Lead Inquiry", base: "/leads" },
@@ -67,9 +71,15 @@ export default function DashboardLayout() {
               alt="Avatar"
               className="avatar"
             />
-            <p>Jatin Poriya</p>
+            <p>{user.name}</p>
           </div>
-          <button>Logout</button>
+          <button
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </button>
         </div>
       </aside>
 

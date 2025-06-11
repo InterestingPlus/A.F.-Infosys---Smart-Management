@@ -6,10 +6,28 @@ import OrderValuation from "../features/orders/OrderValuation";
 import LeadForm from "../features/leads/LeadForm";
 import LeadEdit from "../features/leads/LeadEdit";
 
+import ProtectedRoute from "./ProtectedRoute";
+import Login from "../features/login/Login";
+
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<DashboardLayout />}>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute
+            allowedRoles={[
+              "owner",
+              "accountant",
+              "operator",
+              "surveyor",
+              "telecaller",
+            ]}
+          >
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<LeadForm />} />
         <Route path="/leads/report" element={<LeadDashboard />} />
         <Route path="/leads/form" element={<LeadForm />} />
@@ -17,6 +35,8 @@ export default function AppRoutes() {
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/orders" element={<OrderValuation />} />
       </Route>
+
+      <Route path="/login" element={<Login />} />
     </Routes>
   );
 }
