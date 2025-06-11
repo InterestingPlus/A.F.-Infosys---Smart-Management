@@ -19,6 +19,8 @@
     .form-group {
       display: flex;
       flex-direction: column;
+      width: 100%;
+      max-width: 100%;
 
       label {
         margin-bottom: 0.5rem;
@@ -29,6 +31,9 @@
       input,
       select,
       textarea {
+        width: 100%;
+        max-width: 100%;
+
         padding: 0.6rem 1rem;
         font-size: 1rem;
         border: 1px solid var(--input-border);
@@ -42,6 +47,24 @@
 
       textarea {
         resize: vertical;
+      }
+
+      &.special {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.3rem;
+
+        div {
+          width: 100%;
+          max-width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          input {
+            max-width: 100%;
+          }
+        }
       }
     }
 

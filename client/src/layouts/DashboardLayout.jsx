@@ -41,18 +41,18 @@ export default function DashboardLayout() {
                 {openMenu === base && (
                   <div className="sub-links">
                     <NavLink
-                      to={`${base}/report`}
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      Report
-                    </NavLink>
-                    <NavLink
                       to={`${base}/form`}
                       cclassName={({ isActive }) => (isActive ? "active" : "")}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       Form
+                    </NavLink>
+                    <NavLink
+                      to={`${base}/report`}
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Report
                     </NavLink>
                   </div>
                 )}

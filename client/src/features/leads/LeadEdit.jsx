@@ -5,7 +5,7 @@ import apiPath from "../../isProduction";
 
 export default function LeadEdit() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     customerName: "",
@@ -79,6 +79,78 @@ export default function LeadEdit() {
     }
   };
 
+  function Input({
+    name,
+    label,
+    value,
+    onChange,
+    type = "text",
+    required,
+    placeholder,
+
+    minValue,
+    maxValue,
+  }) {
+    return (
+      <div className="form-group">
+        <label htmlFor={name}>{label}</label>
+        <input
+          id={name}
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          placeholder={isLoading ? "Loading..." : placeholder}
+          {...(minValue !== undefined ? { min: minValue } : {})}
+          {...(maxValue !== undefined ? { max: maxValue } : {})}
+        />
+      </div>
+    );
+  }
+
+  function Select({ name, label, value, onChange, required }) {
+    return (
+      <div className="form-group">
+        <label htmlFor={name}>{label}</label>
+        <select
+          id={name}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+        >
+          <option value="TCM">TCM / તલાટી કમ મંત્રી</option>
+          <option value="Sarpanch">Sarpanch / સરપંચ</option>
+        </select>
+      </div>
+    );
+  }
+  function TextArea({
+    name,
+    label,
+    value,
+    onChange,
+    type = "text",
+    required,
+    placeholder,
+  }) {
+    return (
+      <div className="form-group">
+        <label htmlFor={name}>{label}</label>
+        <textarea
+          id={name}
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          placeholder={placeholder}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="lead-form-page">
       <h2 className="title">
@@ -136,40 +208,56 @@ export default function LeadEdit() {
           onChange={handleChange}
           required
         />
-        <Input
-          name="houseCount"
-          label="7 ઘર/ ખાતા ગામના કેટલા છે"
-          placeholder="House Count"
-          type="number"
-          value={form.houseCount}
-          onChange={handleChange}
-          minValue={1}
-          maxValue={10000}
-          required
-        />
-        <Input
-          name="pricePerHouse"
-          label="8 ભાવ ઘર/ખાતા દીઠ કહેલ"
-          placeholder="Price per House"
-          type="number"
-          value={form.pricePerHouse}
-          onChange={handleChange}
-          minValue={1}
-          maxValue={500}
-          required
-        />
-        <Input
-          name="estimatedBill"
-          label="9 અંદાજીત બીલ રકમ રૂI."
-          placeholder="Estimated Bill"
-          type="number"
-          value={
-            Number(form.houseCount) && Number(form.pricePerHouse)
-              ? Number(form.houseCount) * Number(form.pricePerHouse)
-              : ""
-          }
-          readOnly
-        />
+
+        <div className="form-group special">
+          <div>
+            <label htmlFor="houseCount">7 ઘર/ખાતા</label>
+            <input
+              id="houseCount"
+              name="houseCount"
+              type="number"
+              placeholder="House Count"
+              value={form.houseCount}
+              onChange={handleChange}
+              minValue={1}
+              maxValue={10000}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="pricePerHouse">8 ઘર/ખાતા દીઠ ભાવ</label>
+            <input
+              id="pricePerHouse"
+              name="pricePerHouse"
+              type="number"
+              placeholder="Price per House"
+              value={form.pricePerHouse}
+              onChange={handleChange}
+              minValue={1}
+              maxValue={500}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="estimatedBill">9 અંદાજીત બીલ</label>
+            <input
+              id="estimatedBill"
+              type="number"
+              name="estimatedBill"
+              label="9 અંદાજીત બીલ"
+              placeholder="Estimated Bill"
+              value={
+                Number(form.houseCount) && Number(form.pricePerHouse)
+                  ? Number(form.houseCount) * Number(form.pricePerHouse)
+                  : ""
+              }
+              readOnly
+            />
+          </div>
+        </div>
+
         <Input
           name="inquiryFor"
           label="10 કયુ કામ/વસ્તુ માટે ફોન કરેલ"
@@ -235,78 +323,6 @@ export default function LeadEdit() {
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Input({
-  name,
-  label,
-  value,
-  onChange,
-  type = "text",
-  required,
-  placeholder,
-
-  minValue,
-  maxValue,
-}) {
-  return (
-    <div className="form-group">
-      <label htmlFor={name}>{label}</label>
-      <input
-        id={name}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder={placeholder}
-        {...(minValue !== undefined ? { min: minValue } : {})}
-        {...(maxValue !== undefined ? { max: maxValue } : {})}
-      />
-    </div>
-  );
-}
-
-function Select({ name, label, value, onChange, required }) {
-  return (
-    <div className="form-group">
-      <label htmlFor={name}>{label}</label>
-      <select
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-      >
-        <option value="TCM">TCM / તલાટી કમ મંત્રી</option>
-        <option value="Sarpanch">Sarpanch / સરપંચ</option>
-      </select>
-    </div>
-  );
-}
-function TextArea({
-  name,
-  label,
-  value,
-  onChange,
-  type = "text",
-  required,
-  placeholder,
-}) {
-  return (
-    <div className="form-group">
-      <label htmlFor={name}>{label}</label>
-      <textarea
-        id={name}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder={placeholder}
-      />
     </div>
   );
 }

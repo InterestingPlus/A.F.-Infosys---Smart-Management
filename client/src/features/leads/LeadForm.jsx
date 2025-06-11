@@ -109,40 +109,56 @@ export default function LeadForm() {
           onChange={handleChange}
           required
         />
-        <Input
-          name="houseCount"
-          label="7 ઘર/ ખાતા ગામના કેટલા છે"
-          placeholder="House Count"
-          type="number"
-          value={form.houseCount}
-          onChange={handleChange}
-          minValue={1}
-          maxValue={10000}
-          required
-        />
-        <Input
-          name="pricePerHouse"
-          label="8 ભાવ ઘર/ખાતા દીઠ કહેલ"
-          placeholder="Price per House"
-          type="number"
-          value={form.pricePerHouse}
-          onChange={handleChange}
-          minValue={1}
-          maxValue={500}
-          required
-        />
-        <Input
-          name="estimatedBill"
-          label="9 અંદાજીત બીલ રકમ રૂI."
-          placeholder="Estimated Bill"
-          type="number"
-          value={
-            Number(form.houseCount) && Number(form.pricePerHouse)
-              ? Number(form.houseCount) * Number(form.pricePerHouse)
-              : ""
-          }
-          readOnly
-        />
+
+        <div className="form-group special">
+          <div>
+            <label htmlFor="houseCount">7 ઘર/ખાતા</label>
+            <input
+              id="houseCount"
+              name="houseCount"
+              type="number"
+              placeholder="House Count"
+              value={form.houseCount}
+              onChange={handleChange}
+              minValue={1}
+              maxValue={10000}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="pricePerHouse">8 ઘર/ખાતા દીઠ ભાવ</label>
+            <input
+              id="pricePerHouse"
+              name="pricePerHouse"
+              type="number"
+              placeholder="Price per House"
+              value={form.pricePerHouse}
+              onChange={handleChange}
+              minValue={1}
+              maxValue={500}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="estimatedBill">9 અંદાજીત બીલ</label>
+            <input
+              id="estimatedBill"
+              type="number"
+              name="estimatedBill"
+              label="9 અંદાજીત બીલ"
+              placeholder="Estimated Bill"
+              value={
+                Number(form.houseCount) && Number(form.pricePerHouse)
+                  ? Number(form.houseCount) * Number(form.pricePerHouse)
+                  : ""
+              }
+              readOnly
+            />
+          </div>
+        </div>
+
         <Input
           name="inquiryFor"
           label="10 કયુ કામ/વસ્તુ માટે ફોન કરેલ"
