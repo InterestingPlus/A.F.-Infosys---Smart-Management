@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="gu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Receipt Format PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+      }
+
+      body {
+        padding: 20px;
+        background: #f7f7f7;
+      }
+
+      .pdf-container {
+        padding: 30px;
+        background-color: #fff;
+        width: 100%;
+        max-width: 800px; /* Matches A4 landscape width in px */
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+        padding: 4px 8px;
+        font-size: 1.9rem;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      th {
+        font-weight: 500;
+      }
+
+      .background {
+        background: lightgrey;
+      }
+
+      button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #115e59;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0f766e;
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="downloadPDF()">📄 Download Receipt PDF</button>
+
+    <div id="pdf-content" class="pdf-container">
+      <table>
+        <tr>
+          <th colspan="5">
+            HASANPAR ગ્રામપંચાય <br />
+            પંચાયત હિસાબ ના નમૂનાનો ક્રમાંક - 4 <br />
+            તબદીલ ન કરી શકાય તેવી અસલ પહોંચ (જુઓ નિયમ - 5)
+          </th>
+        </tr>
+        <tr>
+          <th class="left" colspan="5">
+            શ્રીમાન /શ્રીમતી : <span>પંચાસરા ગોવિંદ વરશિંગ</span>
+          </th>
+        </tr>
+        <tr>
+          <th class="left" colspan="5">કબ્જેદાર : <span></span></th>
+        </tr>
+        <tr>
+          <th class="left" colspan="5">
+            સરનામું : <span>જૂનું ગામતળ (1)</span>
+          </th>
+        </tr>
+        <tr>
+          <td class="left" colspan="5">
+            તરફથી સને.2025-2026 ના વર્ષમાં વેરો/બીજા નાણાં પેટે રકમ મળી છે.
+          </td>
+        </tr>
+
+        <tr>
+          <th>મિલકત નંબર</th>
+          <th>જૂનો મિ. નં.</th>
+          <th>પહોંચ નંબર</th>
+          <th>પહોંચ તારીખ</th>
+          <th>વિગત</th>
+        </tr>
+        <tr>
+          <td>39</td>
+          <td></td>
+          <td>1</td>
+          <td>09/05/2025</td>
+          <td>રોકડ</td>
+        </tr>
+
+        <tr class="background">
+          <th colspan="2" rowspan="2" class="background">વેરાનું નામ</th>
+          <th colspan="3">વસુલ કરેલી રકમ</th>
+        </tr>
+        <tr>
+          <th class="background">પાછલી બાકી</th>
+          <th class="background">ચાલુ બાકી</th>
+          <th class="background">કુલ</th>
+        </tr>
+
+        <tr>
+          <td colspan="2">ઘરવેરો</td>
+          <td>1100</td>
+          <td>100</td>
+          <td>1200</td>
+        </tr>
+        <tr>
+          <td colspan="2">સા.પાણી વેરો</td>
+          <td>770</td>
+          <td>70</td>
+          <td>840</td>
+        </tr>
+        <tr>
+          <td colspan="2">ખા.પાણી વેરો</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td colspan="2">સફાઈ વેરો</td>
+          <td>220</td>
+          <td>20</td>
+          <td>240</td>
+        </tr>
+        <tr class="background">
+          <th colspan="2">કુલ</th>
+          <th>2310</th>
+          <th>210</th>
+          <th>2520</th>
+        </tr>
+
+        <tr>
+          <td colspan="5">
+            કુલ રૂપિયા શબ્દોમાં : <span>બે હાજર પાંચસો વીસ રૂપિયા પુરા</span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5">ચેકથી મળેલ નાણાં વસુલાતને આધીન છે</td>
+        </tr>
+        <tr>
+          <td colspan="5">બેન્કનું નામ/ શાખા / । ચેક નંબર / તારીખ 0/</td>
+        </tr>
+      </table>
+    </div>
+
+    <script>
+      function downloadPDF() {
+        const element = document.getElementById("pdf-content");
+
+        const opt = {
+          margin: [0.1, 0.1, 0.1, 0.1],
+          filename: "Receipt_Report.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 8,
+            useCORS: true,
+          },
+          jsPDF: {
+            unit: "in",
+            format: "a4",
+            orientation: "portrait",
+          },
+          pagebreak: { mode: ["css", "legacy"] },
+        };
+
+        html2pdf().set(opt).from(element).save();
+      }
+    </script>
+  </body>
+</html>
