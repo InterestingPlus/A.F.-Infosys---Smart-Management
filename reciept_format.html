@@ -10,6 +10,7 @@
         padding: 0;
         box-sizing: border-box;
         font-family: sans-serif;
+        font-weight: 500;
       }
 
       body {
@@ -21,9 +22,13 @@
         padding: 30px;
         background-color: #fff;
         width: 100%;
-        max-width: 800px; /* Matches A4 landscape width in px */
+        max-width: 750px;
         margin: auto;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      h3 {
+        font-size: 1.6rem;
       }
 
       table {
@@ -35,13 +40,9 @@
       table,
       th,
       td {
-        border: 1px solid black;
+        border: 3px solid black;
         padding: 4px 8px;
         font-size: 1.9rem;
-      }
-
-      .left {
-        text-align: left;
       }
 
       th {
@@ -58,10 +59,33 @@
         padding: 10px 20px;
         background-color: #115e59;
         color: white;
-        font-size: 16px;
+        font-size: 20px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      .bold {
+        font-weight: 600;
+      }
+
+      .weak {
+        font-size: 1.6rem;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .right {
+        text-align: right;
+      }
+      .right > td[colspan="2"] {
+        text-align: left;
       }
 
       button:hover {
@@ -75,86 +99,144 @@
     <div id="pdf-content" class="pdf-container">
       <table>
         <tr>
-          <th colspan="5">
-            HASANPAR ગ્રામપંચાયત <br />
+          <th colspan="5" class="bold">
+            <span class="bold">HASANPAR</span> ગ્રામપંચાયત <br />
+            <p style="font-size: 1.5rem" class="bold">
+              Ta: <span class="bold">Wankaner</span> Di:
+              <span class="bold">MORBI</span>
+            </p>
             પંચાયત હિસાબ ના નમૂનાનો ક્રમાંક - ૪ <br />
             તબદીલ ન કરી શકાય તેવી અસલ પહોંચ (જુઓ નિયમ - ૫)
           </th>
-          ગ્રાહક કોપી 
+          <h3>(ગ્રાહક કોપી)</h3>
         </tr>
         <tr>
           <th class="left" colspan="5">
-            શ્રીમાન /શ્રીમતી : <span>પંચાસરા ગોવિંદ વરશિંગ</span>
+            <span>શ્રીમાન /શ્રીમતી :</span>
+            <span class="bold">પંચાસરા ગોવિંદ વરશિંગ</span>
           </th>
-        </tr>
-        <tr>
-          <th class="left" colspan="5">કબ્જેદાર : <span></span></th>
         </tr>
         <tr>
           <th class="left" colspan="5">
-            સરનામું : <span>જૂનું ગામતળ (1)</span>
+            <span>કબ્જેદાર :</span>
+            <span class="bold"></span>
           </th>
         </tr>
         <tr>
-          <td class="left" colspan="5">
+          <th class="left" colspan="5">
+            <span>સરનામું :</span>
+            <span class="bold">જૂનું ગામતળ </span>
+          </th>
+        </tr>
+        <tr>
+          <td class="left weak" colspan="5">
             તરફથી સને.2025-2026 ના વર્ષમાં વેરો/બીજા નાણાં પેટે રકમ મળી છે.
           </td>
         </tr>
 
         <tr>
-          <th>મિલકત નંબર</th>
-          <th>જૂનો મિ. નં.</th>
-          <th>પહોંચ નંબર</th>
-          <th>પહોંચ તારીખ</th>
-          <th>વિગત</th>
+          <th class="bold weak center">મિલકત નંબર</th>
+          <th class="bold weak center">જૂનો મિ. નં.</th>
+          <th class="bold weak center">પહોંચ નંબર</th>
+          <th class="bold weak center">પહોંચ તારીખ</th>
+          <th class="bold weak center">વિગત</th>
         </tr>
         <tr>
-          <td>39</td>
-          <td></td>
-          <td>1</td>
-          <td>09/05/2025</td>
-          <td>રોકડ</td>
+          <td class="center">39</td>
+          <td class="center"></td>
+          <td class="center">1</td>
+          <td class="center">09/05/2025</td>
+          <td class="center">રોકડ</td>
         </tr>
 
         <tr class="background">
-          <th colspan="2" rowspan="2" class="background">વેરાનું નામ</th>
-          <th colspan="3">વસુલ કરેલી રકમ</th>
-        </tr>
-        <tr>
-          <th class="background">પાછલી બાકી</th>
-          <th class="background">ચાલુ બાકી</th>
-          <th class="background">કુલ</th>
+          <th colspan="2" rowspan="2" class="background bold">વેરાનું નામ</th>
+          <th colspan="3" class="bold">વસુલ કરેલી રકમ</th>
         </tr>
 
         <tr>
+          <th class="background bold">પાછલી બાકી</th>
+          <th class="background bold">ચાલુ બાકી</th>
+          <th class="background bold">કુલ</th>
+        </tr>
+
+        <tr class="right">
           <td colspan="2">ઘરવેરો</td>
           <td>1100</td>
           <td>100</td>
           <td>1200</td>
         </tr>
-        <tr>
+        <tr class="right">
           <td colspan="2">સા.પાણી વેરો</td>
           <td>770</td>
           <td>70</td>
           <td>840</td>
         </tr>
-        <tr>
+        <tr class="right">
           <td colspan="2">ખા.પાણી વેરો</td>
           <td>0</td>
           <td>0</td>
           <td>0</td>
         </tr>
-        <tr>
+        <tr class="right">
           <td colspan="2">સફાઈ વેરો</td>
           <td>220</td>
           <td>20</td>
           <td>240</td>
         </tr>
+        <tr class="right">
+          <td colspan="2">ગટર વેરો</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">નોટીસ</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">એડવાન્સ</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">વ્યવસાય વેરો</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">ઇમલા વેરો</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">શી .ઉ</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">જ , મેં</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">અન્ય૫</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
         <tr class="background">
-          <th colspan="2">કુલ</th>
-          <th>2310</th>
-          <th>210</th>
-          <th>2520</th>
+          <th colspan="2" class="bold">કુલ</th>
+          <th class="bold right">2310.00</th>
+          <th class="bold right">210.00</th>
+          <th class="bold right">2520.00</th>
         </tr>
 
         <tr>
@@ -169,26 +251,71 @@
           <td colspan="5">બેન્કનું નામ/ શાખા / । ચેક નંબર / તારીખ 0/</td>
         </tr>
       </table>
+
+      <div
+        style="
+          border: 3px solid black;
+          padding: 10px;
+          font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
+          font-size: 19px;
+          line-height: 1.8;
+          margin-top: 1rem;
+        "
+      >
+        નોંધ : નીચેનાં શરતોને આધિન વેરો સ્વીકારવામાં આવે છે.<br />
+        (૧) કોઇપણ મિલકતની આકારણી કરવા માટે હક્ક અંગે ચોકસાઈથી થતી નથી માત્ર વેરા
+        ઉઘરાવા પૂરતી જ આકારણી કરવામાં આવે છે.<br />
+        (૨) આ સૂચિત સોસાયટી હોય આ ભરેલ વેરાથી આ જમીન ટાઇટલ કલીયર થતી નથી.<br />
+        (૩) આ પેટેથી ભરેલ વેરાની જમીનનો માલિકી હક્ક પ્રાપ્ત થતો નથી.<br />
+        (૪) ભવિષ્યમાં બિનમનઝુર બાંધકામ ગેરકાયદે બને ત્યારે પેટે કોઈ બચાવરૂપ બનશે
+        નહીં,<br />
+        તેમજ માલિકી હક્ક પ્રાપ્ત કરવા અંગે રજુ કરી શકાય નહીં.<br />
+
+        <div
+          style="text-align: right; margin-top: 20px; font-size: 1.5rem"
+          class="bold"
+        >
+          સહી<br />
+          <p class="bold">
+            તલાટી કમ મંત્રી
+            <span class="bold" style="font-size: 1.55rem">HASANPAR</span>
+            ગ્રામપંચાયત
+          </p>
+        </div>
+      </div>
     </div>
 
     <script>
       function downloadPDF() {
         const element = document.getElementById("pdf-content");
+        window.devicePixelRatio = 2;
 
         const opt = {
-          margin: [0.1, 0.1, 0.1, 0.1],
+          margin: [0.05, 0.05, 0.05, 0.05],
           filename: "Receipt_Report.pdf",
-          image: { type: "jpeg", quality: 0.98 },
+          image: { type: "jpeg", quality: 1 },
+
+          // html2canvas: {
+          //   scale: 8,
+          //   useCORS: true,
+          // },
+          // jsPDF: {
+          //   unit: "in",
+          //   format: "a4",
+          //   orientation: "portrait",
+          // },
+          // pagebreak: { mode: "avoid-all" },
+
           html2canvas: {
-            scale: 8,
+            scale: 2, // Adjust for quality vs size
             useCORS: true,
           },
           jsPDF: {
-            unit: "in",
-            format: "a4",
+            unit: "px",
+            format: [750, 1960], // 750px width (3 inch), 10000px height placeholder
             orientation: "portrait",
           },
-          pagebreak: { mode: ["css", "legacy"] },
+          pagebreak: { mode: ["avoid-all"] },
         };
 
         html2pdf().set(opt).from(element).save();
