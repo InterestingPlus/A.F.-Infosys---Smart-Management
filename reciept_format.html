@@ -384,8 +384,16 @@
           margin: [0.05, 0.05, 0.05, 0.05],
           filename: "Receipt_Report.pdf",
           image: { type: "jpeg", quality: 1.0 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: "px", format: "a4", orientation: "portrait" },
+
+          html2canvas: {
+            scale: 2, // Adjust for quality vs size
+            useCORS: true,
+          },
+          jsPDF: {
+            unit: "px",
+            format: [750, 1960], // 750px width (3 inch), 10000px height placeholder
+            orientation: "portrait",
+          },
           pagebreak: { mode: ["avoid-all"] },
         };
         html2pdf().set(opt).from(element).save();
@@ -461,30 +469,30 @@
           if (n < 100)
             return (
               tens[Math.floor(n / 10)] +
-              (n % 10 !== 0 ? " " + units[n % 10] : "")
+              (n % 10 !== 0 ? " " + units[n % 10] : 0)
             );
           if (n < 1000)
             return (
               units[Math.floor(n / 100)] +
               " સો" +
-              (n % 100 !== 0 ? " " + toWords(n % 100) : "")
+              (n % 100 !== 0 ? " " + toWords(n % 100) : 0)
             );
           if (n < 100000)
             return (
               toWords(Math.floor(n / 1000)) +
               " હજાર" +
-              (n % 1000 !== 0 ? " " + toWords(n % 1000) : "")
+              (n % 1000 !== 0 ? " " + toWords(n % 1000) : 0)
             );
           if (n < 10000000)
             return (
               toWords(Math.floor(n / 100000)) +
               " લાખ" +
-              (n % 100000 !== 0 ? " " + toWords(n % 100000) : "")
+              (n % 100000 !== 0 ? " " + toWords(n % 100000) : 0)
             );
           return (
             toWords(Math.floor(n / 10000000)) +
             " કરોડ" +
-            (n % 10000000 !== 0 ? " " + toWords(n % 10000000) : "")
+            (n % 10000000 !== 0 ? " " + toWords(n % 10000000) : 0)
           );
         }
         return toWords(Math.floor(num)) + " રૂપિયા પુરા";
@@ -497,6 +505,20 @@
           const columnIndex = headerMap[id];
           if (element && record[columnIndex] !== undefined) {
             element.textContent = record[columnIndex];
+            if (id.includes("receipt_date")) {
+              const dateParts = record[columnIndex]
+                .replace("Date(", "")
+                .replace(")", "")
+                .split(",")
+                .map(Number);
+
+              const year = dateParts[0];
+              const month = String(dateParts[1] + 1).padStart(2, "0"); // 0-based → 1-based
+              const day = String(dateParts[2]).padStart(2, "0");
+
+              const formattedDate = `${day}/${month}/${year}`;
+              element.textContent = formattedDate;
+            }
           }
         }
 
