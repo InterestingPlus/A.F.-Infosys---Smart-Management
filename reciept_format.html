@@ -13,6 +13,36 @@
         font-weight: 500;
       }
 
+      /* Add this to your existing <style> block */
+      @media print {
+        /* Hide everything on the page */
+        body * {
+          visibility: hidden;
+        }
+
+        /* Make the receipt container and everything inside it visible */
+        #pdf-content,
+        #pdf-content * {
+          visibility: visible;
+        }
+
+        /* Position the receipt container to fill the print page */
+        #pdf-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          box-shadow: none; /* Remove shadow for printing */
+        }
+
+        /* Optional: Control print margins */
+        @page {
+          margin: 0.5in;
+        }
+      }
+
       body {
         padding: 20px;
         background: #f7f7f7;
@@ -122,6 +152,8 @@
     </style>
   </head>
   <body>
+    <!-- Add this new Print button -->
+    <button onclick="printReceipt()">🖨️ Print Receipt</button>
     <button onclick="downloadPDF()">📄 Download Receipt PDF</button>
 
     <div id="pdf-content" class="pdf-container">
@@ -377,6 +409,10 @@
         taluka: "મેઘરજ",
         district: "અરવલ્લી",
       };
+
+      function printReceipt() {
+        window.print();
+      }
 
       function downloadPDF() {
         const element = document.getElementById("pdf-content");
