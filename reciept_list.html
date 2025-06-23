@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>મિલ્ક્ત પહોચની યાદી - વર્ષ : <span>2025-2026</span></h1>
+
+    <h3>
+      ગામ : <span>HASANPAR</span>
+      <br />
+      તાલકો : <span>Wankaner</span>
+      <br />
+      જીલ્લો : <span>MORBI</span>
+    </h3>
+
+    <table border="1">
+      <tr>
+        <th rowspan="2">ક્રમ નં.</th>
+        <th rowspan="2">માલિકનું નામ</th>
+        <th rowspan="2">સોસાયટીનું નામ</th>
+        <th rowspan="2">મોબાઈલ નં.</th>
+        <th rowspan="2">મિલકત નં.</th>
+        <!-- <th rowspan="2">પહોંચ નં.</th> -->
+        <th rowspan="2">પાછલું બાકી</th>
+        <th rowspan="2">ચાલુ બાકી</th>
+        <th rowspan="2">કુલ બાકી</th>
+
+        <th colspan="2">Reciept</th>
+      </tr>
+
+      <tr>
+        <!-- <th>ક્યાં થી</th>
+        <th>ક્યાં સુધી</th> -->
+
+        <th>View</th>
+        <th>Print</th>
+      </tr>
+    </table>
+
+    <script>
+      async function fetchDataFromSheet(sheetId) {
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        const res = await fetch(url);
+        const text = await res.text();
+
+        const json = JSON.parse(text.substring(47).slice(0, -2));
+
+        const rows = json.table.rows.map((row) =>
+          row.c.map((cell) => (cell ? cell.v : ""))
+        );
+
+        console.table(rows);
+        return rows;
+      }
+
+      function safeNumber(val) {
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+      }
+
+      (async function () {
+        const records = await fetchDataFromSheet(
+          "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y"
+        );
+
+        for (let i = 1; i < records.length; i++) {
+          const row = records[i];
+
+          const current =
+            safeNumber(row[19]) +
+            safeNumber(row[20]) +
+            safeNumber(row[21]) +
+            safeNumber(row[22]) +
+            safeNumber(row[23]) +
+            safeNumber(row[24]);
+
+          const previous =
+            safeNumber(row[25]) +
+            safeNumber(row[26]) +
+            safeNumber(row[27]) +
+            safeNumber(row[28]) +
+            safeNumber(row[29]) +
+            safeNumber(row[30]);
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i}</td>
+            <td>${row[1]}</td>
+            <td>${row[4]}</td>
+            <td>${row[17]}</td>
+            <td>${row[5]}</td>
+            <td>${previous == null ? 0 : previous}</td> 
+            <td>${current}</td>
+            <td>${previous + current}</td>
+                 <td>
+            <a href="${`reciept_format.html?m_id=${i}`}"><button>View</button></a>
+        </td>
+        <td>
+            <a href="${`reciept_format.html?m_id=${i}`}"><button>Print</button></a>
+        </td>`;
+          document.querySelector("table").appendChild(tr);
+        }
+      })();
+    </script>
+  </body>
+</html>

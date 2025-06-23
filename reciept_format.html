@@ -33,7 +33,7 @@
 
       table {
         width: 100%;
-        border: 1px solid black;
+        border: 1.5px solid black;
         border-collapse: collapse;
       }
 
@@ -88,6 +88,34 @@
         text-align: left;
       }
 
+      .fit-width {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+        min-width: fit-content;
+      }
+      .fit-width span {
+        white-space: nowrap;
+      }
+
+      .middle-table,
+      .middle-table th,
+      .middle-table td {
+        border-collapse: collapse;
+        border: 0;
+      }
+      .middle-table {
+        border-left: 2px solid black;
+        border-right: 2px solid black;
+      }
+      .middle-table tr {
+        border-bottom: 1px solid black;
+      }
+      .middle-table tr:last-child {
+        border-bottom: 0 !important;
+      }
+
       button:hover {
         background-color: #0f766e;
       }
@@ -100,37 +128,50 @@
       <table>
         <tr>
           <th colspan="5" class="bold">
-            <span class="bold">HASANPAR</span> ગ્રામપંચાયત <br />
+            <span class="bold village-name"></span> ગ્રામપંચાયત <br />
             પંચાયત હિસાબ ના નમૂનાનો ક્રમાંક - ૪ <br />
             તબદીલ ન કરી શકાય તેવી અસલ પહોંચ (જુઓ નિયમ - ૫)
             <p style="font-size: 1.5rem" class="bold">
-              તાલુકો: <span class="bold">Wankaner</span> જિલ્લો:
-              <span class="bold">MORBI</span>
+              તાલુકો: <span class="bold" id="taluka"></span> જિલ્લો:
+              <span class="bold" id="district"></span>
             </p>
           </th>
           <h3>(ગ્રાહક કોપી)</h3>
         </tr>
+      </table>
+
+      <table class="middle-table">
         <tr>
-          <th class="left" colspan="5">
+          <td class="left fit-width">
             <span>શ્રીમાન /શ્રીમતી :</span>
-            <span class="bold">પંચાસરા ગોવિંદ વરશિંગ</span>
-          </th>
+          </td>
+          <td>
+            <span class="bold" id="name"></span>
+          </td>
         </tr>
         <tr>
-          <th class="left" colspan="5">
+          <td class="left fit-width">
             <span>કબ્જેદાર :</span>
-            <span class="bold"></span>
-          </th>
+          </td>
+          <td>
+            <span class="bold" id="owner_name"></span>
+          </td>
         </tr>
         <tr>
-          <th class="left" colspan="5">
+          <td class="left fit-width">
             <span>સરનામું :</span>
-            <span class="bold">જૂનું ગામતળ </span>
-          </th>
+          </td>
+          <td>
+            <span class="bold" id="address"></span>
+          </td>
         </tr>
+      </table>
+
+      <table>
         <tr>
           <td class="left weak" colspan="5">
-            તરફથી સને.2025-2026 ના વર્ષમાં વેરો/બીજા નાણાં પેટે રકમ મળી છે.
+            તરફથી સને.<span id="valuationYear"></span> ના વર્ષમાં વેરો/બીજા
+            નાણાં પેટે રકમ મળી છે.
           </td>
         </tr>
 
@@ -142,106 +183,113 @@
           <th class="bold weak center">વિગત</th>
         </tr>
         <tr>
-          <td class="center">39</td>
-          <td class="center"></td>
-          <td class="center">1</td>
-          <td class="center">09/05/2025</td>
-          <td class="center">રોકડ</td>
+          <td class="center" id="milkat_number"></td>
+          <td class="center" id="old_milkat_number"></td>
+          <td class="center" id="receipt_number"></td>
+          <td class="center" id="receipt_date"></td>
+          <td class="center" id="payment_type">રોકડ</td>
         </tr>
+      </table>
 
+      <table>
         <tr class="background">
           <th colspan="2" rowspan="2" class="background bold">વેરાનું નામ</th>
           <th colspan="3" class="bold">વસુલ કરેલી રકમ</th>
         </tr>
-
         <tr>
-          <th class="background bold">પાછલી બાકી</th>
           <th class="background bold">ચાલુ બાકી</th>
+          <th class="background bold">પાછલી બાકી</th>
           <th class="background bold">કુલ</th>
         </tr>
 
         <tr class="right">
           <td colspan="2">ઘરવેરો</td>
-          <td>1100</td>
-          <td>100</td>
-          <td>1200</td>
+          <td id="houseTax">0</td>
+          <td id="houseTaxPrevYear">0</td>
+          <td id="houseTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">સા.પાણી વેરો</td>
-          <td>770</td>
-          <td>70</td>
-          <td>840</td>
+          <td id="saPaTax">0</td>
+          <td id="saPaTaxPrevYear">0</td>
+          <td id="saPaTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">ખા.પાણી વેરો</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="specialWaterTax">0</td>
+          <td id="specialWaterTaxPrevYear">0</td>
+          <td id="specialWaterTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">લાઈટવેરો</td>
+          <td id="lightTax">0</td>
+          <td id="lightTaxPrevYear">0</td>
+          <td id="lightTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">સફાઈ વેરો</td>
-          <td>220</td>
-          <td>20</td>
-          <td>240</td>
+          <td id="cleaningTax">0</td>
+          <td id="cleaningTaxPrevYear">0</td>
+          <td id="cleaningTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">ગટર વેરો</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="sewerTax">0</td>
+          <td id="sewerTaxPrevYear">0</td>
+          <td id="sewerTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">નોટીસ</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="noticeFee">0</td>
+          <td id="noticeFeePrevYear">0</td>
+          <td id="noticeFeeTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">એડવાન્સ</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="advance">0</td>
+          <td id="advancePrevYear">0</td>
+          <td id="advanceTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">વ્યવસાય વેરો</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="businessTax">0</td>
+          <td id="businessTaxPrevYear">0</td>
+          <td id="businessTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">ઇમલા વેરો</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="buildingTax">0</td>
+          <td id="buildingTaxPrevYear">0</td>
+          <td id="buildingTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">શી .ઉ</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="educationTax">0</td>
+          <td id="educationTaxPrevYear">0</td>
+          <td id="educationTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">જ , મેં</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="landTax">0</td>
+          <td id="landTaxPrevYear">0</td>
+          <td id="landTaxTotal">0</td>
         </tr>
         <tr class="right">
           <td colspan="2">અન્ય૫</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
+          <td id="talukaTax">0</td>
+          <td id="talukaTaxPrevYear">0</td>
+          <td id="talukaTaxTotal">0</td>
         </tr>
         <tr class="background">
           <th colspan="2" class="bold">કુલ</th>
-          <th class="bold right">2310.00</th>
-          <th class="bold right">210.00</th>
-          <th class="bold right">2520.00</th>
+          <th class="bold right" id="CurrentTotal">00.00</th>
+          <th class="bold right" id="PreviousTotal">00.00</th>
+          <th class="bold right" id="Total">00.00</th>
         </tr>
 
         <tr>
           <td colspan="5">
-            કુલ રૂપિયા શબ્દોમાં : <span>બે હાજર પાંચસો વીસ રૂપિયા પુરા</span>
+            કુલ રૂપિયા શબ્દોમાં : <span id="totalInWords"></span>
           </td>
         </tr>
         <tr>
@@ -254,7 +302,7 @@
 
       <div
         style="
-          border: 3px solid black;
+          border: 2px solid black;
           padding: 10px;
           font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
           font-size: 19px;
@@ -278,7 +326,7 @@
           સહી<br />
           <p class="bold">
             તલાટી કમ મંત્રી
-            <span class="bold" style="font-size: 1.55rem">HASANPAR</span>
+            <span class="bold village-name" style="font-size: 1.55rem"></span>
             ગ્રામપંચાયત
           </p>
         </div>
@@ -286,40 +334,260 @@
     </div>
 
     <script>
+      /**
+       * Maps HTML element IDs to their corresponding column index in the Google Sheet.
+       * This is the central configuration for populating the receipt.
+       * Update the index numbers here if your Google Sheet columns change.
+       */
+      const headerMap = {
+        // Top Section
+        name: 1,
+        valuationYear: 2,
+        owner_name: 3,
+        address: 4,
+        milkat_number: 5,
+        old_milkat_number: 6,
+        // Assuming taluka and district might be the same as village or fetched from elsewhere.
+        // If they are in the sheet, add them here. For now, let's assume they are static or derived.
+        // receipt_number and receipt_date would likely be generated or come from another source.
+        // Let's assume they are in the sheet for this example.
+        receipt_number: 0, // Placeholder
+        receipt_date: 15, // Using resolutionDate as receipt_date
+
+        // Current Year Taxes
+        houseTax: 19,
+        saPaTax: 20,
+        specialWaterTax: 21,
+        lightTax: 22,
+        cleaningTax: 23,
+        talukaTax: 24,
+
+        // Previous Year Taxes (assuming these are in subsequent columns)
+        houseTaxPrevYear: 25,
+        saPaTaxPrevYear: 26,
+        specialWaterTaxPrevYear: 27,
+        lightTaxPrevYear: 28,
+        cleaningTaxPrevYear: 29,
+        talukaTaxPrevYear: 30,
+      };
+
+      // Configuration for static data (can also be fetched)
+      const STATIC_DATA = {
+        village: "મેઘરજ",
+        taluka: "મેઘરજ",
+        district: "અરવલ્લી",
+      };
+
       function downloadPDF() {
         const element = document.getElementById("pdf-content");
-        window.devicePixelRatio = 2;
-
         const opt = {
           margin: [0.05, 0.05, 0.05, 0.05],
           filename: "Receipt_Report.pdf",
-          image: { type: "jpeg", quality: 1 },
-
-          // html2canvas: {
-          //   scale: 8,
-          //   useCORS: true,
-          // },
-          // jsPDF: {
-          //   unit: "in",
-          //   format: "a4",
-          //   orientation: "portrait",
-          // },
-          // pagebreak: { mode: "avoid-all" },
-
-          html2canvas: {
-            scale: 2, // Adjust for quality vs size
-            useCORS: true,
-          },
-          jsPDF: {
-            unit: "px",
-            format: [750, 1960], // 750px width (3 inch), 10000px height placeholder
-            orientation: "portrait",
-          },
+          image: { type: "jpeg", quality: 1.0 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "px", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all"] },
         };
-
         html2pdf().set(opt).from(element).save();
       }
+
+      async function fetchDataFromSheet(sheetId, recordId) {
+        // In Google Sheets, header is row 1, data starts from row 2.
+        // So, we fetch row `recordId + 1`.
+        const range = `A${recordId + 3}:AZ${recordId + 3}`;
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&range=${range}`;
+
+        console.log(`Fetching from URL: ${url}`);
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`Network response was not ok: ${res.statusText}`);
+        }
+        const text = await res.text();
+        const json = JSON.parse(text.substring(47).slice(0, -2));
+
+        if (!json.table.rows || json.table.rows.length === 0) {
+          throw new Error(`Record with ID '${recordId}' not found.`);
+        }
+
+        const record = json.table.rows[0].c.map((cell) => (cell ? cell.v : ""));
+        console.log("Fetched Record:", record);
+        return record;
+      }
+
+      function safeNumber(val) {
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+      }
+
+      function numberToGujaratiWords(num) {
+        if (num === 0) return "શૂન્ય રૂપિયા પુરા";
+        const units = [
+            "",
+            "એક",
+            "બે",
+            "ત્રણ",
+            "ચાર",
+            "પાંચ",
+            "છ",
+            "સાત",
+            "આઠ",
+            "નવ",
+            "દસ",
+            "અગિયાર",
+            "બાર",
+            "તેર",
+            "ચૌદ",
+            "પંદર",
+            "સોળ",
+            "સત્તર",
+            "અઢાર",
+            "ઓગણીસ",
+          ],
+          tens = [
+            "",
+            "",
+            "વીસ",
+            "ત્રીસ",
+            "ચાળીસ",
+            "પચાસ",
+            "સાંઠ",
+            "સિત્તેર",
+            "એંસી",
+            "નેવું",
+          ];
+
+        function toWords(n) {
+          if (n < 20) return units[n];
+          if (n < 100)
+            return (
+              tens[Math.floor(n / 10)] +
+              (n % 10 !== 0 ? " " + units[n % 10] : "")
+            );
+          if (n < 1000)
+            return (
+              units[Math.floor(n / 100)] +
+              " સો" +
+              (n % 100 !== 0 ? " " + toWords(n % 100) : "")
+            );
+          if (n < 100000)
+            return (
+              toWords(Math.floor(n / 1000)) +
+              " હજાર" +
+              (n % 1000 !== 0 ? " " + toWords(n % 1000) : "")
+            );
+          if (n < 10000000)
+            return (
+              toWords(Math.floor(n / 100000)) +
+              " લાખ" +
+              (n % 100000 !== 0 ? " " + toWords(n % 100000) : "")
+            );
+          return (
+            toWords(Math.floor(n / 10000000)) +
+            " કરોડ" +
+            (n % 10000000 !== 0 ? " " + toWords(n % 10000000) : "")
+          );
+        }
+        return toWords(Math.floor(num)) + " રૂપિયા પુરા";
+      }
+
+      function populateReceipt(record) {
+        // --- 1. Populate direct fields from headerMap ---
+        for (const id in headerMap) {
+          const element = document.getElementById(id);
+          const columnIndex = headerMap[id];
+          if (element && record[columnIndex] !== undefined) {
+            element.textContent = record[columnIndex];
+          }
+        }
+
+        // --- Populate static/repeated fields ---
+        document
+          .querySelectorAll(".village-name")
+          .forEach((el) => (el.textContent = STATIC_DATA.village));
+        document.getElementById("taluka").textContent = STATIC_DATA.taluka;
+        document.getElementById("district").textContent = STATIC_DATA.district;
+
+        // --- 2. Perform Calculations ---
+        const taxFields = [
+          "houseTax",
+          "saPaTax",
+          "specialWaterTax",
+          "lightTax",
+          "cleaningTax",
+          "talukaTax",
+          "sewerTax",
+          "noticeFee",
+          "advance",
+          "businessTax",
+          "buildingTax",
+          "educationTax",
+          "landTax",
+        ];
+
+        let currentTotal = 0;
+        let previousTotal = 0;
+
+        taxFields.forEach((field) => {
+          const currentVal = safeNumber(
+            document.getElementById(field)?.textContent || "0"
+          );
+          const prevVal = safeNumber(
+            document.getElementById(`${field}PrevYear`)?.textContent || "0"
+          );
+          const total = currentVal + prevVal;
+
+          currentTotal += currentVal;
+          previousTotal += prevVal;
+
+          // --- 3. Update Calculated UI Fields (row totals) ---
+          const totalElement = document.getElementById(`${field}Total`);
+          if (totalElement) {
+            totalElement.textContent = total.toFixed(2);
+          }
+        });
+
+        const grandTotal = currentTotal + previousTotal;
+
+        // --- 4. Update Grand Totals and Amount in Words ---
+        document.getElementById("CurrentTotal").textContent =
+          currentTotal.toFixed(2);
+        document.getElementById("PreviousTotal").textContent =
+          previousTotal.toFixed(2);
+        document.getElementById("Total").textContent = grandTotal.toFixed(2);
+        document.getElementById("totalInWords").textContent =
+          numberToGujaratiWords(grandTotal);
+      }
+
+      // --- Main execution block that runs on page load ---
+      (async function () {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const m_id = urlParams.get("m_id");
+
+          if (!m_id) {
+            alert("Please provide a record ID in the URL (e.g., ?m_id=2)");
+            document.body.innerHTML = `<h1 style="text-align:center; margin-top: 50px;">No Record ID provided.</h1><p style="text-align:center;">Please add <strong>?m_id=YOUR_RECORD_ID</strong> to the end of the URL.</p>`;
+            return;
+          }
+
+          const recordIdAsNumber = parseInt(m_id, 10);
+          if (isNaN(recordIdAsNumber)) {
+            throw new Error("Invalid Record ID. It must be a number.");
+          }
+
+          // Your Google Sheet ID
+          const sheetId = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y";
+          const record = await fetchDataFromSheet(sheetId, recordIdAsNumber);
+
+          populateReceipt(record);
+        } catch (error) {
+          console.error("Failed to generate receipt:", error);
+          alert(`Error: ${error.message}`);
+          document.getElementById(
+            "pdf-content"
+          ).innerHTML = `<h2 style="color: red; text-align: center;">Failed to load receipt data.</h2><p style="text-align: center;">${error.message}</p>`;
+        }
+      })();
     </script>
   </body>
 </html>
