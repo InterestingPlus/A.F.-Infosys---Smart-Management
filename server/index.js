@@ -183,8 +183,8 @@ async function connectToWhatsApp() {
   });
 }
 
-const { google } = require("googleapis");
-const path = require("path");
+import { google } from "googleapis";
+import path from "path";
 
 // --- Google Sheets Configuration ---
 // IMPORTANT: Replace with your actual service account key file path and sheet details
