@@ -186,6 +186,12 @@ async function connectToWhatsApp() {
 import { google } from "googleapis";
 import path from "path";
 
+import { fileURLToPath } from "url";
+
+// Fix __dirname for ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // --- Google Sheets Configuration ---
 // IMPORTANT: Replace with your actual service account key file path and sheet details
 const KEY_FILE_PATH = path.join(
@@ -226,8 +232,8 @@ async function updateSheetCells(range, values) {
       const updatedRow = [...row]; // clone the row
 
       if (row[18] === "") {
-        updatedRow[18] = existingRow[18] ?? "Meghraj - MEGHRAJ"; // preserve existing if available
-      }
+         updatedRow[18] = existingRow[18] ?? "Meghraj - MEGHRAJ"; // preserve existing if available
+      } 
 
       return updatedRow;
     });
@@ -284,6 +290,8 @@ app.post("/update-sheet-record", async (req, res) => {
       message: "Missing milkatId or rowData in request.",
     });
   }
+
+  
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
