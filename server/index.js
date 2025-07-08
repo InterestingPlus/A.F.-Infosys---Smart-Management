@@ -428,6 +428,13 @@ app.post("/update-receipt", async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+app.get("/debug-status", (req, res) => {
+  res.json({
+    socketInitialized: Boolean(socket),
+    isConnected,
+  });
+});
+
 // Reciept Automation Script End
 
 // Server
