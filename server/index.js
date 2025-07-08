@@ -7,7 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import inquiryRoutes from "./routes/inquiryRoutes.js";
 import qrcode from "qrcode-terminal";
 
-import WASocket, {
+import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
@@ -139,7 +139,7 @@ async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
   const { version } = await fetchLatestBaileysVersion();
 
-  socket = WASocket({
+  socket = makeWASocket({
     // printQRInTerminal: true, // This option is deprecated, we remove it.
     auth: state,
     version,
