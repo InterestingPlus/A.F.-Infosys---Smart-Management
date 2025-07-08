@@ -438,7 +438,10 @@ app.get("/debug-status", (req, res) => {
 // Reciept Automation Script End
 
 // Server
+// Server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  // Call the function to connect to WhatsApp after the server starts
+  connectToWhatsApp();
 });
