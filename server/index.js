@@ -196,9 +196,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- Google Sheets Configuration ---
-// IMPORTANT: Replace with your actual service account key file path and sheet details
-const KEY_FILE_PATH = path.join(__dirname, "af-infosys-c9ccb3ab388f.json"); 
-
 const KEY_FILE_PATH = path.join(
   __dirname,
   "af-infosys-c9ccb3ab388f.json"
