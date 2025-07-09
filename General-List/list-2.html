@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tax Bill Search - A.F. Infosys</title>
+    <title>Tax Bill Search - A.F. Infosys (Admin)</title>
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
@@ -97,44 +97,45 @@
 
       /* --- New CSS for Tabular Layout on larger screens --- */
       .table-container {
-          margin-top: 20px;
-          overflow-x: auto; /* Allows horizontal scrolling on smaller screens if table is too wide */
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          padding: 15px;
+        margin-top: 20px;
+        overflow-x: auto; /* Allows horizontal scrolling on smaller screens if table is too wide */
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
       }
 
       .data-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 0; /* Remove default table margins */
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0; /* Remove default table margins */
       }
 
-      .data-table th, .data-table td {
-          padding: 12px 15px;
-          text-align: left;
-          border-bottom: 1px solid #eee;
+      .data-table th,
+      .data-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
       }
 
       .data-table th {
-          background-color: #f2f2f2;
-          font-weight: 600;
-          color: #333;
-          text-transform: uppercase;
-          font-size: 0.9em;
+        background-color: #f2f2f2;
+        font-weight: 600;
+        color: #333;
+        text-transform: uppercase;
+        font-size: 0.9em;
       }
 
       .data-table tbody tr:hover {
-          background-color: #f5f5f5;
+        background-color: #f5f5f5;
       }
 
       .data-table .action-button {
-          padding: 8px 12px;
-          font-size: 0.9em;
-          display: inline-block; /* Keep button inline for tables */
-          width: auto; /* Override full width from card style */
-          margin-top: 0; /* Remove top margin */
+        padding: 8px 12px;
+        font-size: 0.9em;
+        display: inline-block; /* Keep button inline for tables */
+        width: auto; /* Override full width from card style */
+        margin-top: 0; /* Remove top margin */
       }
 
       /* --- Basic styling for existing elements --- */
@@ -272,25 +273,26 @@
       }
 
       /* Media Queries for Responsive Display */
-      @media (max-width: 768px) { /* On screens up to 768px wide (mobile/small tablet) */
-          .table-container {
-              display: none !important; /* Force hide table */
-          }
-          .results-container {
-              display: flex !important; /* Force show cards */
-              flex-direction: column;
-          }
+      @media (max-width: 768px) {
+        /* On screens up to 768px wide (mobile/small tablet) */
+        .table-container {
+          display: none !important; /* Force hide table */
+        }
+        .results-container {
+          display: flex !important; /* Force show cards */
+          flex-direction: column;
+        }
       }
 
-      @media (min-width: 769px) { /* On screens wider than 768px (tablet/desktop) */
-          .table-container {
-              display: block !important; /* Force show table */
-          }
-          .results-container {
-              display: none !important; /* Force hide cards */
-          }
+      @media (min-width: 769px) {
+        /* On screens wider than 768px (tablet/desktop) */
+        .table-container {
+          display: block !important; /* Force show table */
+        }
+        .results-container {
+          display: none !important; /* Force hide cards */
+        }
       }
-
     </style>
   </head>
   <body>
@@ -300,7 +302,7 @@
 
     <div class="container">
       <header class="header">
-        <h1>A.F. Infosys</h1>
+        <h1>A.F. Infosys (Admin Panel)</h1>
 
         <h1>મિલ્ક્ત પહોચની યાદી - વર્ષ : <span>2025-2026</span></h1>
 
@@ -314,10 +316,10 @@
       </header>
 
       <div class="panel secure-search">
-        <h2>તમારું બિલ શોધો</h2>
+        <h2>બધા બિલ શોધો</h2>
         <p>
-          માલિકનું નામ અથવા મોબાઈલ નં. દાખલ કરો (બેમાંથી એક ફરજિયાત), અને જરૂર
-          હોય તો સોસાયટી પસંદ કરો.
+          માલિકનું નામ અથવા મોબાઈલ નં. દાખલ કરો (બધા રેકોર્ડ જોવા માટે ખાલી
+          છોડો), અને જરૂર હોય તો સોસાયટી પસંદ કરો.
         </p>
         <div class="filter-section">
           <div class="filter-input-group">
@@ -326,7 +328,6 @@
               id="searchName"
               placeholder="માલિકનું નામ..."
               class="filter-input"
-              minlength="3"
             />
           </div>
           <div class="filter-input-group">
@@ -335,7 +336,6 @@
               id="searchMobile"
               placeholder="મોબાઈલ નં..."
               class="filter-input"
-              minlength="10"
               maxlength="10"
             />
           </div>
@@ -350,8 +350,7 @@
         </div>
       </div>
 
-      <div id="results" class="results-container" style="display: none">
-        </div>
+      <div id="results" class="results-container" style="display: none"></div>
 
       <div id="resultsTable" class="table-container" style="display: none">
         <table class="data-table">
@@ -367,7 +366,6 @@
           <tbody id="resultBodyTable"></tbody>
         </table>
       </div>
-
     </div>
 
     <script>
@@ -420,12 +418,10 @@
         const mobileInput = mobileInputElem.value.trim();
         const selectedSociety = societyFilterElem.value.trim().toLowerCase();
 
-        if (!nameInput && !mobileInput) {
-          alert("માલિકનું નામ અથવા મોબાઈલ નં. દાખલ કરો.");
-          return;
-        }
+        // Removed the !nameInput && !mobileInput alert
+        // Admin can search with empty fields to see all records or apply filters
 
-        // Validate minimum length for name and mobile
+        // Validate minimum length for name and mobile (still useful for specific searches)
         if (nameInput && nameInput.length < 3) {
           alert("માલિકનું નામ ઓછામાં ઓછા 3 અક્ષરનું હોવું જોઈએ.");
           return;
@@ -446,31 +442,38 @@
           if (nameInput) {
             // First, try exact match for the whole name string
             if (ownerName === nameInput) {
-                nameMatch = true;
+              nameMatch = true;
             } else {
-                // Fallback to flexible word-based match
-                const searchWords = nameInput.split(/\s+/).filter(Boolean);
-                const ownerNameWords = ownerName.split(/\s+/).filter(Boolean);
-                nameMatch = searchWords.every(word => ownerNameWords.includes(word));
+              // Fallback to flexible word-based match
+              const searchWords = nameInput.split(/\s+/).filter(Boolean);
+              const ownerNameWords = ownerName.split(/\s+/).filter(Boolean);
+              nameMatch = searchWords.every((word) =>
+                ownerNameWords.includes(word)
+              );
             }
+          } else {
+            nameMatch = true; // If no name input, consider it a match
           }
 
-          const mobileMatch = mobileInput && mobile.includes(mobileInput);
+          let mobileMatch = false;
+          if (mobileInput) {
+            mobileMatch = mobile.includes(mobileInput);
+          } else {
+            mobileMatch = true; // If no mobile input, consider it a match
+          }
+
           const societyMatch = !selectedSociety || society === selectedSociety;
 
-          return (nameMatch || mobileMatch) && societyMatch;
+          // For admin, if both nameInput and mobileInput are empty, show all based on society, or all if society is also empty.
+          // If either nameInput or mobileInput is provided, then apply that specific filter.
+          return (
+            (nameInput === "" && mobileInput === "" && societyMatch) ||
+            (((nameMatch && mobileInput === "") ||
+              (mobileMatch && nameInput === "")) &&
+              societyMatch) ||
+            (nameMatch && mobileMatch && societyMatch)
+          );
         });
-
-        // Uncomment this block if you want to re-enable the "not enough detail" alert
-        // if (filtered.length > 1) {
-        //   alert("શોધની વિગતો અપૂરતી છે, વધુ વિગતો દાખલ કરો.");
-        //   nameInputElem.value = ""; // Clear inputs
-        //   mobileInputElem.value = "";
-        //   societyFilterElem.value = "";
-        //   document.getElementById("results").style.display = "none"; // Hide results
-        //   document.getElementById("resultsTable").style.display = "none"; // Hide table results
-        //   return;
-        // }
 
         renderSecureResults(filtered);
       }
@@ -481,16 +484,17 @@
         const resultBodyTable = document.getElementById("resultBodyTable"); // Table tbody
 
         resultsContainer.innerHTML = ""; // Clear previous card results
-        resultBodyTable.innerHTML = "";  // Clear previous table results
+        resultBodyTable.innerHTML = ""; // Clear previous table results
 
-        // Hide both by default, then show the appropriate one
+        // Hide both by default, then show the appropriate one via JS
         resultsContainer.style.display = "none";
         resultsTableContainer.style.display = "none";
 
         if (records.length === 0) {
+          // If no records, display message in the card container
           resultsContainer.innerHTML =
             '<div class="no-records-found">તમારું રેકોર્ડ મળ્યું નથી.</div>';
-          resultsContainer.style.display = "flex"; // Show card container to display no records message
+          resultsContainer.style.display = "flex"; // Show card container for the message
           return;
         }
 
@@ -582,6 +586,8 @@
             if (allRecords[i][4]) societyNames.add(allRecords[i][4]);
           }
           populateSocietyFilters();
+          // *** NEW: Display all records initially for admin ***
+          renderSecureResults(allRecords.slice(1)); // Skip header row
         } catch (err) {
           alert(
             "ડેટા લોડ કરવામાં ક્ષમતા નિષ્ફળ ગઈ. કૃપા કરીને ફરી પ્રયાસ કરો."
@@ -595,24 +601,40 @@
       // Optional: Re-render results on window resize if current results are visible
       // This ensures the view switches automatically if the user resizes their browser
       let resizeTimer;
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-          // Only re-render if results are currently displayed
+          // If there are records currently displayed (or if no search was performed yet, all should be shown)
+          // This is a simplified re-render; a more advanced solution would track the *last filtered* dataset.
+          // For now, the CSS media queries will handle the visual switch,
+          // and a new search will trigger the full JS re-render.
+          // If you want a full re-render on resize (e.g., if you sort data differently for mobile/desktop),
+          // you would need to store the `filtered` results globally after `handleSecureSearch` or `init`.
           const resultsContainer = document.getElementById("results");
           const resultsTableContainer = document.getElementById("resultsTable");
-          if (resultsContainer.style.display === "flex" || resultsTableContainer.style.display === "block") {
-            // Re-call renderSecureResults with the last filtered records
-            // This requires storing the last filtered records, or re-filtering.
-            // For simplicity, we can just clear and re-hide if a search hasn't been performed.
-            // A more robust solution would involve storing `lastFilteredRecords` in a global variable
-            // and passing it here, but for this specific request,
-            // we'll rely on the CSS media queries to handle the visibility toggle.
-            // The JavaScript logic will only run when a new search is performed.
-            // For automatic switching without a new search, you would need to store `filtered` and pass it.
-            // However, the CSS will handle the display toggle effectively.
+          if (
+            resultsContainer.style.display === "flex" ||
+            resultsTableContainer.style.display === "block"
+          ) {
+            // Re-render based on the currently displayed records (if any) or all records if no search performed
+            // To achieve a proper re-render on resize without a new search,
+            // you would need to store the `filtered` array globally and pass it here.
+            // As the current setup relies on CSS for display switching, a full JS re-render might be overkill here,
+            // unless you have other responsive layout changes tied to JS.
+            // For now, if no search has been performed (i.e., all records are shown initially),
+            // we can just re-render all of them.
+            if (
+              !document.getElementById("searchName").value &&
+              !document.getElementById("searchMobile").value &&
+              !document.getElementById("societyFilter").value
+            ) {
+              renderSecureResults(allRecords.slice(1));
+            } else {
+              // If a search was performed, we can't easily re-render without the `filtered` data.
+              // The CSS handles the display toggle in this case.
+            }
           }
-        }, 200); // Debounce to prevent excessive calls
+        }, 250); // Debounce to prevent too many calls
       });
     </script>
   </body>
