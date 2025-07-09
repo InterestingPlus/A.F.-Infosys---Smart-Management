@@ -189,7 +189,6 @@ async function connectToWhatsApp() {
 
 import { google } from "googleapis";
 import path from "path";
-
 import { fileURLToPath } from "url";
 
 // Fix __dirname for ES module
@@ -198,12 +197,15 @@ const __dirname = path.dirname(__filename);
 
 // --- Google Sheets Configuration ---
 // IMPORTANT: Replace with your actual service account key file path and sheet details
+const KEY_FILE_PATH = path.join(__dirname, "af-infosys-c9ccb3ab388f.json"); 
+
 const KEY_FILE_PATH = path.join(
   __dirname,
   "auth_info_baileys/af-infosys-c9ccb3ab388f.json"
 ); // Path to your service account key file
-const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y"; // The ID from your sheet's URL
-const SHEET_NAME = "AC MAST"; // The name of the specific sheet/tab you want to update
+
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID; // Make sure GOOGLE_SHEET_ID is also in your Render env vars
+const SHEET_NAME = "AC MAST";  // The name of the specific sheet/tab you want to update
 
 // --- Google Sheets Authentication ---
 const auth = new google.auth.GoogleAuth({
@@ -213,6 +215,7 @@ const auth = new google.auth.GoogleAuth({
 
 // Create Sheets client
 const sheets = google.sheets({ version: "v4", auth });
+
 
 /**
  * Updates a specific range of cells in a Google Sheet.
