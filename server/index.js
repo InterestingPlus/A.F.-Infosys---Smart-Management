@@ -7,11 +7,13 @@ import authRoutes from "./routes/authRoutes.js";
 import inquiryRoutes from "./routes/inquiryRoutes.js";
 import qrcode from "qrcode-terminal";
 
-import makeWASocket, {
-  DisconnectReason,
-  useMultiFileAuthState,
-  fetchLatestBaileysVersion,
-} from "@whiskeysockets/baileys";
+// import makeWASocket, {
+//   DisconnectReason,
+//   useMultiFileAuthState,
+//   fetchLatestBaileysVersion,
+// } from "@whiskeysockets/baileys";
+
+import * as baileys from "@whiskeysockets/baileys";
 
 let socket;
 let isConnected = false;
@@ -136,10 +138,10 @@ app.post("/send-receipt", async (req, res) => {
 
 // --- 6. WHATSAPP CONNECTION LOGIC (THIS IS THE UPDATED PART) ---
 async function connectToWhatsApp() {
-  const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
-  const { version } = await fetchLatestBaileysVersion();
+  const { state, saveCreds } = await baileys.useMultiFileAuthState("auth_info_baileys"); // Access useMultiFileAuthState from 'baileys'
+  const { version } = await baileys.fetchLatestBaileysVersion(); // Access fetchLatestBaileysVersion from 'baileys'
 
-  socket = makeWASocket({
+  socket = baileys.makeWASocket({ // Access makeWASocket from 'baileys'
     // printQRInTerminal: true, // This option is deprecated, we remove it.
     auth: state,
     version,
@@ -162,7 +164,7 @@ async function connectToWhatsApp() {
       isConnected = false;
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !==
-        DisconnectReason.loggedOut;
+        baileys.DisconnectReason.loggedOut; // Access DisconnectReason from 'baileys'
       console.log(
         "Connection closed. Reason:",
         lastDisconnect?.error,
@@ -182,6 +184,8 @@ async function connectToWhatsApp() {
     }
   });
 }
+
+
 
 import { google } from "googleapis";
 import path from "path";
