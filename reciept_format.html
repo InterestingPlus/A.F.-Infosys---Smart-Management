@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="gu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Receipt Format PDF</title>
+    <script src="html2pdf.bundle.min.js"></script>
+    <script src="qrcode.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-weight: 500;
+      }
+
+      /* Add this to your existing <style> block */
+      @media print {
+        /* Hide everything on the page */
+        body * {
+          visibility: hidden;
+        }
+
+        /* Make the receipt container and everything inside it visible */
+        #pdf-content,
+        #pdf-content * {
+          visibility: visible;
+        }
+
+        /* Position the receipt container to fill the print page */
+        #pdf-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          box-shadow: none; /* Remove shadow for printing */
+        }
+
+        /* Optional: Control print margins */
+        @page {
+          margin: 0.5in;
+        }
+      }
+
+      body {
+        padding: 20px;
+        background: #f7f7f7;
+      }
+
+      .pdf-container {
+        padding: 30px;
+        background-color: #fff;
+        width: 100%;
+        max-width: 750px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      h3 {
+        font-size: 1.6rem;
+      }
+
+      table {
+        width: 100%;
+        border: 1.5px solid black;
+        border-collapse: collapse;
+      }
+
+      table,
+      th,
+      td {
+        border: 2px solid black;
+        padding: 4px 8px;
+        font-size: 1.9rem;
+      }
+
+      th {
+        font-weight: 500;
+      }
+
+      .background {
+        background: lightgrey;
+      }
+
+      button,
+      a {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #115e59;
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      .bold {
+        font-weight: 600;
+      }
+
+      .weak {
+        font-size: 1.6rem;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .right {
+        text-align: right;
+      }
+      .right > td[colspan="2"] {
+        text-align: left;
+      }
+
+      .fit-width {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+        min-width: fit-content;
+      }
+      .fit-width span {
+        white-space: nowrap;
+      }
+
+      /* .middle-table,
+      .middle-table th,
+      .middle-table td {
+        border-collapse: collapse;
+        border: 0;
+      }
+      .middle-table {
+        border-left: 2px solid black;
+        border-right: 2px solid black;
+      }
+      .middle-table tr {
+        border-bottom: 1px solid black;
+      }
+      .middle-table tr:last-child {
+        border-bottom: 0 !important;
+      } */
+
+      button:hover,
+      a:hover {
+        background-color: #0f766e;
+      }
+
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .back-button {
+        background-color: #c3ccff;
+        color: #333;
+        border: 1px solid #ccc;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="action-buttons">
+      <a href="/list.html" class="back-button">⬅️ Go Back</a>
+      <button id="print-btn">🖨️ Print Receipt</button>
+      <button id="download-btn">📄 Download Receipt PDF</button>
+    </div>
+
+    <div id="pdf-content" class="pdf-container">
+      <table>
+        <tr>
+          <th colspan="5" class="bold">
+            <span class="bold village-name"></span> ગ્રામપંચાયત <br />
+            પંચાયત હિસાબ ના નમૂનાનો ક્રમાંક - ૪ <br />
+            તબદીલ ન કરી શકાય તેવી અસલ પહોંચ (જુઓ નિયમ - ૫)
+            <p style="font-size: 1.5rem" class="bold">
+              તાલુકો: <span class="bold" id="taluka"></span> જિલ્લો:
+              <span class="bold" id="district"></span>
+            </p>
+          </th>
+          <h3>*ગ્રાહક કોપી*</h3>
+        </tr>
+
+        <tr>
+          <td class="left" colspan="5">
+            <span>શ્રીમાન /શ્રીમતી :</span>
+            <span class="bold" id="name"></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="left" colspan="5">
+            <span>કબ્જેદાર :</span>
+            <span class="bold" id="owner_name"></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="left" colspan="5">
+            <span>સરનામું :</span>
+            <span class="bold" id="address"></span>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="left weak" colspan="5">
+            તરફથી સને.<span id="valuationYear"></span> ના વર્ષમાં વેરો/બીજા
+            નાણાં પેટે રકમ મળી છે.
+          </td>
+        </tr>
+
+        <tr>
+          <th class="bold weak center">મિલકત નંબર</th>
+          <th class="bold weak center">જૂનો મિલકત નં.</th>
+          <th class="bold weak center">પહોંચ નંબર</th>
+          <th class="bold weak center">પહોંચ તારીખ</th>
+          <th class="bold weak center">વિગત</th>
+        </tr>
+        <tr>
+          <td class="center" id="milkat_number"></td>
+          <td class="center" id="old_milkat_number"></td>
+          <td class="center" id="receipt_number"></td>
+          <td class="center" id="receipt_date"></td>
+          <td class="center" id="payment_type"></td>
+        </tr>
+      </table>
+
+      <table>
+        <tr class="background">
+          <th colspan="2" rowspan="2" class="background bold">વેરાનું નામ</th>
+          <th colspan="3" class="bold">વસુલ કરેલી રકમ</th>
+        </tr>
+        <tr>
+          <th class="background bold">ચાલુ બાકી</th>
+          <th class="background bold">પાછલી બાકી</th>
+          <th class="background bold">કુલ</th>
+        </tr>
+
+        <tr class="right">
+          <td colspan="2">ઘરવેરો</td>
+          <td id="houseTax">0</td>
+          <td id="houseTaxPrevYear">0</td>
+          <td id="houseTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">સા.પાણી વેરો</td>
+          <td id="saPaTax">0</td>
+          <td id="saPaTaxPrevYear">0</td>
+          <td id="saPaTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">ખા.પાણી વેરો</td>
+          <td id="specialWaterTax">0</td>
+          <td id="specialWaterTaxPrevYear">0</td>
+          <td id="specialWaterTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">સફાઈ વેરો</td>
+          <td id="cleaningTax">0</td>
+          <td id="cleaningTaxPrevYear">0</td>
+          <td id="cleaningTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">ગટર વેરો</td>
+          <td id="sewerTax">0</td>
+          <td id="sewerTaxPrevYear">0</td>
+          <td id="sewerTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">લાઈટવેરો</td>
+          <td id="lightTax">0</td>
+          <td id="lightTaxPrevYear">0</td>
+          <td id="lightTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">એડવાન્સ</td>
+          <td id="advance">0</td>
+          <td id="advancePrevYear">0</td>
+          <td id="advanceTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">નોટીસ</td>
+          <td id="noticeFee">0</td>
+          <td id="noticeFeePrevYear">0</td>
+          <td id="noticeFeeTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">અન્ય</td>
+          <td id="businessTax">0</td>
+          <td id="businessTaxPrevYear">0</td>
+          <td id="businessTaxTotal">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">તાલુકા પં. કર</td>
+          <td id="talukaTax">0</td>
+          <td id="talukaTaxPrevYear">0</td>
+          <td id="talukaTaxTotal">0</td>
+        </tr>
+
+        <tr class="right">
+          <td colspan="2">અન્ય૩</td>
+          <td id="otherTax3">0</td>
+          <td id="otherTax3PrevYear">0</td>
+          <td id="otherTax3Total">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">અન્ય૪</td>
+          <td id="otherTax4">0</td>
+          <td id="otherTax4PrevYear">0</td>
+          <td id="otherTax4Total">0</td>
+        </tr>
+        <tr class="right">
+          <td colspan="2">અન્ય૫</td>
+          <td id="otherTax5">0</td>
+          <td id="otherTax5PrevYear">0</td>
+          <td id="otherTax5Total">0</td>
+        </tr>
+        <tr class="background">
+          <th colspan="2" class="bold">કુલ</th>
+          <th class="bold right" id="CurrentTotal">00.00</th>
+          <th class="bold right" id="PreviousTotal">00.00</th>
+          <th class="bold right" id="Total">00.00</th>
+        </tr>
+
+        <tr>
+          <td colspan="5">
+            કુલ રૂપિયા શબ્દોમાં : <span id="totalInWords"></span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5">ચેકથી મળેલ નાણાં વસુલાતને આધીન છે</td>
+        </tr>
+        <tr>
+          <td colspan="5">બેન્કનું નામ/ શાખા / । ચેક નંબર / તારીખ 0/</td>
+        </tr>
+      </table>
+
+      <div
+        style="
+          border: 2px solid black;
+          padding: 10px;
+          font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
+          font-size: 19px;
+          line-height: 1.8;
+          margin-top: 1rem;
+        "
+      >
+        નોંધ : નીચેનાં શરતોને આધિન વેરો સ્વીકારવામાં આવે છે.<br />
+        (૧) કોઇપણ મિલકતની આકારણી કરવા માટે હક્ક અંગે ચોકસાઈથી થતી નથી માત્ર વેરા
+        ઉઘરાવા પૂરતી જ આકારણી કરવામાં આવે છે.<br />
+        (૨) આ સૂચિત સોસાયટી હોય આ ભરેલ વેરાથી આ જમીન ટાઇટલ કલીયર થતી નથી.<br />
+        (૩) આ પેટેથી ભરેલ વેરાની જમીનનો માલિકી હક્ક પ્રાપ્ત થતો નથી.<br />
+        (૪) ભવિષ્યમાં બિનમનઝુર બાંધકામ ગેરકાયદે બને ત્યારે પેટે કોઈ બચાવરૂપ બનશે
+        નહીં,<br />
+        તેમજ માલિકી હક્ક પ્રાપ્ત કરવા અંગે રજુ કરી શકાય નહીં.<br />
+
+        <div
+          style="text-align: right; margin-top: 20px; font-size: 1.5rem"
+          class="bold"
+        >
+          સહી<br />
+          <p class="bold">
+            તલાટી કમ મંત્રી
+            <span class="bold village-name" style="font-size: 1.55rem"></span>
+            ગ્રામપંચાયત
+          </p>
+        </div>
+        <!-- Add this inside your pdf-content div -->
+        <div
+          style="
+            text-align: center;
+            margin-top: 20px;
+            border-top: 2px solid black;
+            padding-top: 20px;
+          "
+        >
+          <h3 style="font-size: 1.8rem; margin-bottom: 10px">
+            ચુકવણી માટે QR કોડ સ્કેન કરો
+          </h3>
+          <div
+            id="qrcode-container"
+            style="display: flex; justify-content: center"
+          >
+            <!-- The QR Code will be generated here by JavaScript -->
+            <div id="qrcode"></div>
+          </div>
+          <p style="font-size: 1.9rem; margin-top: 10px; font-weight: 700">
+            Scan to Pay:
+            <strong id="qr-amount" style="font-weight: 700"></strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="reciept.js"></script>
+  </body>
+</html>
