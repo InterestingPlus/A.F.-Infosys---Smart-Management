@@ -201,7 +201,7 @@ const KEY_FILE_PATH = path.join(__dirname, "af-infosys-c9ccb3ab388f.json");
 
 const KEY_FILE_PATH = path.join(
   __dirname,
-  "auth_info_baileys/af-infosys-c9ccb3ab388f.json"
+  "af-infosys-c9ccb3ab388f.json"
 ); // Path to your service account key file
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID; // Make sure GOOGLE_SHEET_ID is also in your Render env vars
