@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "af-infosys",
+  "private_key_id": "c9ccb3ab388ff3a519ce63e60cd8105a9396ed5e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDkmXA3F1zGfLkJ\nS3zM2495XQO+KFSdUKJGvJ7TO23X34UpMadxGY8l2nVXwJHNxgcQ3X1guigC+X0R\neOCMnwZC9Bax73oniyuA+H5er0FQOPkJV8qjX2E7GqHbodEdCnaH8BGqROmi6YhM\njUXX23aj1bf1mGagZOq8HkVcedkNQLwtyShXq/07q+zi3j3kUC4lWmjBxZNkZ3wW\nnv+i8k0sPhsduMXIms6HhqyptamHR/FzcKefctqWry1s5mf1gxVdDsK4aIObdn8d\nhfLldqXnMMjvLlDBuceAw4l/krXgzO6ryoY/PdHyZsWKY4lStsU9QSPn9aISRJOX\nR7hiE6PzAgMBAAECggEAGHwUyFnQvpPCT+wNcHW93s5nJbl1IqptzyzJyC8v2zTe\nMuTWHeeSbQgClIUUONmSjSxkDvWxbmwhiLsNNhKcXZR+T82qJE0kOjqjcmnMEZcg\nmW8VTb1cETQPjRI+byFdQ78jbTzXV3My/ZwOFIo1oWO1QfFyYJCekcqePELyzBfk\nnNj3KyYy1Y7IAJ0V/B2bKosodt0FckERgZXPbhVFQdYqGRnIbeXM3i5JZ3P6gBvt\nMFlbR4ansIrfKp1j8FmtpogsnGkaa4pL4QNpIGe9rNKdyIXzFcS0GP9jLiteOiKp\n6LuqXNr9ytr5Sgiah3gY6BYBuGYkoDPdVn9mg20/jQKBgQD0ZFcU6waJtUQpO17O\nXA8RKPAMX0ww/M1YheFYDjql3xPsqS90Xscvd/Rpx3x6USCaTVlR2Bm4HGDD2gBg\ncHZGDjZHBCSIaZL5Hbs06m0LpzfICMRXv46eARfmgjg6XoOPsX9BZJrK0XZAJm7s\ndedZ74hB6ZI6ce/wkpvY9Zvk7QKBgQDvdRHeLJwwQ+qm/ipGZ7hN+k5/ZRm7IDGS\nBuQ9OHWqzHKFkm2COL+ESuub+IK+6u/zOsk/m/zpr+DUxwMKBwGKY/x98aea0W+3\nZ45qeK5QzB2Y3WER8iXXpy+h/BNCuauHJyrcrV1my20iGd73MhcfleYvdYWhfcaa\nge/CzRpwXwKBgQCUXV3oWw3rB9pLVbmmeYjEGCAywp/UlYRsG0rEVE8SZ60G3Wbr\ntKYjkSUWGn7dGuc6BX8WCqUCemfcPjpAUcXbncEht8gd8EnDZmNCKpbsniVlEL1x\nr9762RsTWzabaMlhsJXasyKtwh+RrkNk1ecPWDVWHmAhjw3k9HwcaG6tuQKBgBe+\n8UWqANccdRGYVNLkiDdbYhtqCDIxUBkeC9YyWiDU42pxieCHBh71WwX9j+Gk5KSn\nKLvhGSSHZ3FSRu/gn/t8TNakdy14JW73mvzd+NNUWn8FPRINhEktcCDNIY/VX7go\nXyzBGGkQNUNTc3PqCLb+I3SDX/wSv/YkeoVD16JbAoGBAM557g9XVh07GwZaxfp8\nWg8A8tpIlTGjbqdFqRBePF86VdPcCtL40ILqNkavKjZ4Vq8o40GuzdvD4Tq5TkQP\nZxa4VExQPc3FH/C3boc64mr1dt3DTeVuailbmeDvsAZSvlJJNEUBIL0eySpS+iP3\nZn8kdYtYIK7xu0UaxubDxUvA\n-----END PRIVATE KEY-----\n",
+  "client_email": "afinfosys@af-infosys.iam.gserviceaccount.com",
+  "client_id": "115547884573923021658",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/afinfosys%40af-infosys.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
