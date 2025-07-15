@@ -1,120 +1,214 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import { connectDB } from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js";
-import inquiryRoutes from "./routes/inquiryRoutes.js";
-import qrcode from "qrcode-terminal";
-import * as baileys from "@whiskeysockets/baileys";
-import { google } from "googleapis";
-import path from "path";
-import { fileURLToPath } from "url";
-import job from "./cron.js";
+// =================================================================
+// ==      WHATSAPP RECEIPT SENDER BOT (BACKEND - CORRECTED)      ==
+// =================================================================
 
-dotenv.config();
+// here is the website page code part that is getting the data and bind to the table to display : @injections/bindDataTable.js , can you modify this code          │
+// │   that works like reqesting to api to send all the fetched data before binding to that table... and we can get the data into our database, but that data          │
+// │   fields that come and displaying by bind function, is not enough fields of data... there are such more fields as you can see in this file:                       │
+// │   @injections/EditPage.html this all fields are complete. now i want to know if we can fetch all this fields into that bindDataTable function, because this       │
+// │   binddatatable function fetch all the records, but not all fields, so, that edit page html code does provide all fields but only one record... how can we        │
+// │   modify the code thats get all the required records with all fields and send that data into our backend through api... you dont have to worry for that           │
+// │   api, you just have to modify the function that gets all the required data... but first test by storing alll the fetched data into localstorage, instead         │
+// │   of sending it to our server... we can test it by looking to the localstorage that if the program satisfies our dependency! thank you so much, good Luck!
 
-const app = express();
+// --- 1. DEPENDENCIES ---
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const qrcode = require("qrcode-terminal"); // <-- ADD THIS NEW LIBRARY
+const {
+  default: WASocket,
+  DisconnectReason,
+  useMultiFileAuthState,
+  fetchLatestBaileysVersion,
+} = require("@whiskeysockets/baileys");
 
-job.start();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// DB Connection
-connectDB();
-
-// Fix __dirname for ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// --- Google Sheets Configuration ---
-const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_NAME = "AC MAST";
-
-// --- Google Sheets Authentication (Service Account JSON from Environment Variable) ---
-let googleAuthClient;
-
-try {
-  if (!process.env.GOOGLE_CREDENTIALS_JSON) {
-    throw new Error("GOOGLE_CREDENTIALS_JSON environment variable is not set.");
-  }
-  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-
-  googleAuthClient = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-} catch (error) {
-  console.error(
-    "❌ Critical Error: Google Sheets authentication failed.",
-    error.message
-  );
-  console.error(
-    "Please ensure GOOGLE_CREDENTIALS_JSON is correctly set and contains valid JSON."
-  );
-  process.exit(1); // Exit if authentication fails
-}
-
-const sheets = google.sheets({ version: "v4", auth: googleAuthClient });
-
-// WhatsApp Bot State
+// --- 2. GLOBAL VARIABLES ---
 let socket;
 let isConnected = false;
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("A.F. Infosys Smart Management CRM, Server is Running!");
-});
+// --- 3. EXPRESS SERVER SETUP ---
+const app = express();
+app.use(cors());
+const PORT = process.env.PORT || 4444;
+app.use(express.json());
+app.get("/", (_, res) => res.send("🤖 WhatsApp Receipt Sender is running."));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/leads", inquiryRoutes);
-
-// --- Google Sheets Helper Functions ---
-
-/**
- * Fetches data from a specific row in a Google Sheet.
- * @param {string} sheetId The ID of the spreadsheet.
- * @param {number} recordId The 0-indexed row number to fetch (converted to 1-indexed for Google Sheets).
- * @returns {Promise<Array<any>>} An array representing the row's cell values.
- */
+// ... (All your utility functions: fetchDataFromSheet, formatJid, safeNumber remain the same) ...
 async function fetchDataFromSheet(sheetId, recordId) {
-  const range = `${SHEET_NAME}!A${recordId + 1}:AZ${recordId + 1}`;
+  const range = `A${recordId + 1}:AZ${recordId + 1}`;
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&range=${range}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Network response was not ok.`);
+  const text = await res.text();
+  const json = JSON.parse(text.substring(47).slice(0, -2));
+  if (!json.table.rows || json.table.rows.length === 0) {
+    throw new Error(`Record with ID '${recordId}' not found.`);
+  }
+  return json.table.rows[0].c.map((cell) => (cell ? cell.v : ""));
+}
+function formatJid(phone) {
+  if (typeof phone !== "string") phone = String(phone);
+  const cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.length === 10) return `91${cleaned}@s.whatsapp.net`;
+  if (cleaned.length > 10) return `${cleaned}@s.whatsapp.net`;
+  return null;
+}
+function safeNumber(val) {
+  const num = parseFloat(val);
+  return isNaN(num) ? 0 : num;
+}
 
-  try {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
-      range: range,
+// --- 5. THE 'SEND RECEIPT' HTTP ENDPOINT (remains the same) ---
+app.post("/send-receipt", async (req, res) => {
+  if (!isConnected || !socket) {
+    return res.status(503).json({
+      success: false,
+      message: "WhatsApp bot is not connected or ready.",
     });
-
-    const rows = response.data.values;
-    if (!rows || rows.length === 0) {
-      // If the row exists but is empty, it returns an empty array for values.
-      // If the range is beyond the data, rows will be undefined.
-      console.warn(
-        `No data found for recordId: ${recordId} in range: ${range}`
-      );
-      return []; // Return an empty array if no data is found for the row
-    }
-    return rows[0].map((cell) =>
-      cell !== undefined && cell !== null ? cell : ""
+  }
+  const { m_id } = req.body;
+  if (!m_id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing m_id in request." });
+  }
+  try {
+    const recordId = parseInt(m_id, 10) + 2;
+    console.log(`[Request] Received request for m_id: ${recordId}`);
+    const record = await fetchDataFromSheet(
+      process.env.GOOGLE_SHEET_ID,
+      recordId
     );
+    const ownerName = record[1] || "Valued Customer";
+    const phoneNumber = record[17];
+    // !! Adjust these indices if your sheet changes !!
+    const totalAmount = (
+      safeNumber(record[19]) +
+      safeNumber(record[20]) +
+      safeNumber(record[21]) +
+      safeNumber(record[22]) +
+      safeNumber(record[23]) +
+      safeNumber(record[24]) +
+      safeNumber(record[25]) +
+      safeNumber(record[26]) +
+      safeNumber(record[27]) +
+      safeNumber(record[28]) +
+      safeNumber(record[29]) +
+      safeNumber(record[30])
+    ).toFixed(2);
+    if (!phoneNumber)
+      throw new Error(`No phone number at index 17 for m_id ${recordId}`);
+    const jid = formatJid(phoneNumber);
+    if (!jid) throw new Error(`Invalid phone number: ${phoneNumber}`);
+    const receiptUrl = `https://afinfosys.netlify.app/reciept_format.html?m_id=${m_id}`;
+    const messageText = `નમસ્તે ${ownerName},\n\nતમારી ગ્રામ પંચાયતની રસીદ તૈયાર છે. કુલ રકમ ₹${totalAmount} છે.\n\nનીચે આપેલા બટન પર ક્લિક કરીને તમારી રસીદ જુઓ અને ચુકવણી કરો.\n${receiptUrl}\n\nઆભાર,\nગ્રામ પંચાયત`;
+    const buttonMessage = {
+      text: messageText,
+      footer: "Meghraj Gram Panchayat",
+      templateButtons: [
+        {
+          index: 1,
+          urlButton: {
+            displayText: "રસીદ જુઓ / View Receipt",
+            url: receiptUrl,
+          },
+        },
+      ],
+    };
+    await socket.sendMessage(jid, buttonMessage);
+    console.log(`[Success] Sent receipt for m_id ${recordId} to ${jid}`);
+    res
+      .status(200)
+      .json({ success: true, message: `Receipt sent to ${phoneNumber}` });
   } catch (error) {
     console.error(
-      `Error fetching data from sheet (recordId: ${recordId}, range: ${range}):`,
+      `[Failed] Could not send receipt for m_id ${m_id}:`,
       error.message
     );
-    throw error;
+    res.status(500).json({ success: false, message: error.message });
   }
+});
+
+// --- 6. WHATSAPP CONNECTION LOGIC (THIS IS THE UPDATED PART) ---
+async function connectToWhatsApp() {
+  const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
+  const { version } = await fetchLatestBaileysVersion();
+
+  socket = WASocket({
+    // printQRInTerminal: true, // This option is deprecated, we remove it.
+    auth: state,
+    version,
+    browser: ["AF-Infosys", "ReceiptBot", "1.0"],
+  });
+
+  socket.ev.on("creds.update", saveCreds);
+
+  socket.ev.on("connection.update", (update) => {
+    // We destructure qr from the update object
+    const { connection, lastDisconnect, qr } = update;
+
+    // ** THIS IS THE NEW LOGIC TO HANDLE THE QR CODE **
+    if (qr) {
+      console.log("QR Code received, please scan with your phone's WhatsApp:");
+      qrcode.generate(qr, { small: true }); // Print the QR code to the terminal
+    }
+
+    if (connection === "close") {
+      isConnected = false;
+      const shouldReconnect =
+        lastDisconnect?.error?.output?.statusCode !==
+        DisconnectReason.loggedOut;
+      console.log(
+        "Connection closed. Reason:",
+        lastDisconnect?.error,
+        ". Reconnecting:",
+        shouldReconnect
+      );
+      if (shouldReconnect) {
+        connectToWhatsApp();
+      } else {
+        console.log("❌ Disconnected permanently. You were logged out.");
+      }
+    } else if (connection === "open") {
+      isConnected = true;
+      console.log(
+        "✅ WhatsApp connection opened successfully! Ready to send receipts."
+      );
+    }
+  });
 }
+
+const { google } = require("googleapis");
+const path = require("path");
+
+// --- Google Sheets Configuration ---
+// IMPORTANT: Replace with your actual service account key file path and sheet details
+const KEY_FILE_PATH = path.join(
+  __dirname,
+  "auth_info_baileys/af-infosys-c9ccb3ab388f.json"
+); // Path to your service account key file
+const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y"; // The ID from your sheet's URL
+const SHEET_NAME = "AC MAST"; // The name of the specific sheet/tab you want to update
+
+// --- Google Sheets Authentication ---
+const auth = new google.auth.GoogleAuth({
+  keyFile: KEY_FILE_PATH,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"], // Scope for read/write access
+});
+
+// Create Sheets client
+const sheets = google.sheets({ version: "v4", auth });
 
 /**
  * Updates a specific range of cells in a Google Sheet.
  * @param {string} range A1 notation (e.g., 'Sheet1!A1', 'Sheet1!C5:D10')
  * @param {Array<Array<any>>} values An array of arrays, where each inner array is a row of values.
  */
+
 async function updateSheetCells(range, values) {
   try {
+    // Step 1: Get existing values from the sheet
     const currentData = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: range,
@@ -122,19 +216,19 @@ async function updateSheetCells(range, values) {
 
     const existingValues = currentData.data.values || [];
 
+    // Step 2: Only preserve value at index 18 if it's empty in the new data
     const finalValues = values.map((row, rowIndex) => {
       const existingRow = existingValues[rowIndex] || [];
-      const updatedRow = [...row];
+      const updatedRow = [...row]; // clone the row
 
-      if (
-        (row[18] === "" || row[18] === undefined || row[18] === null) &&
-        existingRow[18] !== undefined
-      ) {
-        updatedRow[18] = existingRow[18];
+      if (row[18] === "") {
+        updatedRow[18] = existingRow[18] ?? "Meghraj - MEGHRAJ"; // preserve existing if available
       }
+
       return updatedRow;
     });
 
+    // Step 3: Send updated values
     const request = {
       spreadsheetId: SPREADSHEET_ID,
       range: range,
@@ -163,13 +257,12 @@ async function appendSheetRows(values) {
   try {
     const request = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A1`,
+      range: `${SHEET_NAME}!A1`, // Range can be just the sheet name for appending
       valueInputOption: "USER_ENTERED",
       resource: {
         values: values,
       },
     };
-
     const response = await sheets.spreadsheets.values.append(request);
     console.log(`Appended ${response.data.updates.updatedCells} cells.`);
     return response.data;
@@ -179,172 +272,52 @@ async function appendSheetRows(values) {
   }
 }
 
-// --- WhatsApp Helper Functions ---
-
-function formatJid(phone) {
-  if (typeof phone !== "string") phone = String(phone);
-  const cleaned = phone.replace(/[^0-9]/g, "");
-  if (cleaned.length === 10) return `91${cleaned}@s.whatsapp.net`;
-  if (cleaned.length > 10) return `${cleaned}@s.whatsapp.net`;
-  return null;
-}
-
-function safeNumber(val) {
-  const num = parseFloat(val);
-  return isNaN(num) ? 0 : num;
-}
-
-// --- API Endpoints ---
-
-// Send Receipt Endpoint
-app.post("/send-receipt", async (req, res) => {
-  if (!isConnected || !socket) {
-    return res.status(503).json({
-      success: false,
-      message:
-        "WhatsApp bot is not connected or ready. Please wait or check logs.",
-    });
-  }
-
-  const { m_id } = req.body;
-  if (!m_id) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing m_id in request." });
-  }
-
-  try {
-    const recordId = parseInt(m_id, 10);
-    const rowToFetch = recordId + 2; // Adjust for header rows and 1-indexing for sheets
-
-    console.log(
-      `[Request] Received request for m_id: ${m_id}, fetching sheet row: ${rowToFetch}`
-    );
-
-    const record = await fetchDataFromSheet(
-      process.env.GOOGLE_SHEET_ID,
-      rowToFetch - 1
-    ); // fetchDataFromSheet expects 0-indexed row number.
-
-    if (record.length === 0) {
-      throw new Error(
-        `No data found for m_id ${m_id} (sheet row ${rowToFetch}).`
-      );
-    }
-
-    const ownerName = record[1] || "Valued Customer";
-    const phoneNumber = record[17]; // !! Adjust these indices if your sheet changes !!
-    const totalAmount = (
-      safeNumber(record[19]) +
-      safeNumber(record[20]) +
-      safeNumber(record[21]) +
-      safeNumber(record[22]) +
-      safeNumber(record[23]) +
-      safeNumber(record[24]) +
-      safeNumber(record[25]) +
-      safeNumber(record[26]) +
-      safeNumber(record[27]) +
-      safeNumber(record[28]) +
-      safeNumber(record[29]) +
-      safeNumber(record[30])
-    ).toFixed(2);
-
-    if (!phoneNumber)
-      throw new Error(
-        `No phone number at index 17 for m_id ${m_id} (sheet row ${rowToFetch})`
-      );
-
-    const jid = formatJid(phoneNumber);
-    if (!jid) throw new Error(`Invalid phone number format: ${phoneNumber}`);
-
-    const receiptUrl = `https://afinfosys.netlify.app/reciept_format.html?m_id=${m_id}`;
-
-    const messageText = `નમસ્તે ${ownerName},\n\nતમારી ગ્રામ પંચાયતની રસીદ તૈયાર છે. કુલ રકમ ₹${totalAmount} છે.\n\nનીચે આપેલા બટન પર ક્લિક કરીને તમારી રસીદ જુઓ અને ચુકવણી કરો.\n${receiptUrl}\n\nઆભાર,\nગ્રામ પંચાયત`;
-
-    const buttonMessage = {
-      text: messageText,
-      footer: "Meghraj Gram Panchayat",
-      templateButtons: [
-        {
-          index: 1,
-          urlButton: {
-            displayText: "રસીદ જુઓ / View Receipt",
-            url: receiptUrl,
-          },
-        },
-      ],
-    };
-
-    await socket.sendMessage(jid, buttonMessage);
-    console.log(`[Success] Sent receipt for m_id ${m_id} to ${jid}`);
-    res
-      .status(200)
-      .json({ success: true, message: `Receipt sent to ${phoneNumber}` });
-  } catch (error) {
-    console.error(
-      `[Failed] Could not send receipt for m_id ${m_id}:`,
-      error.message
-    );
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Update Sheet Record Endpoint
 app.post("/update-sheet-record", async (req, res) => {
   const { milkatId, rowData } = req.body;
-
   if (!milkatId || !rowData) {
     return res.status(400).json({
       success: false,
       message: "Missing milkatId or rowData in request.",
     });
   }
-
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:AZ`,
+      range: `${SHEET_NAME}!A:Z`, // Read a large enough range to cover your data
     };
-
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
-    const rows = getResponse.data.values || [];
+    const rows = getResponse.data.values;
 
-    const MILKAT_COL_INDEX = 5;
+    const MILKAT_COL_INDEX = 5; // Assuming Milkat Number is in the first column (index 0)
 
     let rowIndexToUpdate = -1;
-
     console.log(`[DEBUG] Received milkatId for update: ${milkatId}`);
-
-    for (let i = 0; i < rows.length; i++) {
-      if (i === 2) continue; // Skip the 3rd row (index 2) as per your original logic
-
-      const sheetMilkatId = rows[i][MILKAT_COL_INDEX];
-
-      console.log(
-        `[DEBUG] Checking row ${i}, Milkat ID in sheet: ${sheetMilkatId}`
-      );
-
-      if (
-        sheetMilkatId !== undefined &&
-        sheetMilkatId !== null &&
-        String(sheetMilkatId).trim() === String(milkatId).trim()
-      ) {
-        rowIndexToUpdate = i;
-        console.log(`[DEBUG] Match found at row index: ${rowIndexToUpdate}`);
-        break;
+    if (rows) {
+      for (let i = 0; i < rows.length; i++) {
+        if (i === 2) continue; // Skip the 3rd row (index 2)
+        const sheetMilkatId = rows[i][MILKAT_COL_INDEX];
+        console.log(
+          `[DEBUG] Checking row ${i}, Milkat ID in sheet: ${sheetMilkatId}`
+        );
+        if (
+          sheetMilkatId &&
+          parseFloat(sheetMilkatId) === parseFloat(milkatId)
+        ) {
+          rowIndexToUpdate = i;
+          console.log(`[DEBUG] Match found at row index: ${rowIndexToUpdate}`);
+          break;
+        }
       }
     }
 
     if (rowIndexToUpdate !== -1) {
-      const rowNumber = rowIndexToUpdate + 1;
-      const rangeToUpdate = `${SHEET_NAME}!A${rowNumber}`;
-
+      const rowNumber = rowIndexToUpdate + 1; // Google Sheets is 1-indexed
+      const rangeToUpdate = `${SHEET_NAME}!A${rowNumber}`; // Update the entire row starting from column A
       console.log(
         `[DEBUG] Updating sheet at row number: ${rowNumber}, range: ${rangeToUpdate}`
       );
 
       await updateSheetCells(rangeToUpdate, [rowData]);
-
       console.log(`Milkat ${milkatId} record updated at row ${rowNumber}`);
       res.status(200).json({
         success: true,
@@ -367,7 +340,7 @@ app.post("/update-sheet-record", async (req, res) => {
   }
 });
 
-// Update Receipt Number and Date Endpoint
+// Reciept Number Updation on Record
 app.post("/update-receipt", async (req, res) => {
   const { milkatId, receiptNumber } = req.body;
 
@@ -381,26 +354,18 @@ app.post("/update-receipt", async (req, res) => {
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:AZ`,
+      range: `${SHEET_NAME}!A:Z`,
     };
-
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
-    const rows = getResponse.data.values || [];
+    const rows = getResponse.data.values;
 
     const MILKAT_COL_INDEX = 5;
-
     let rowIndexToUpdate = -1;
 
     for (let i = 0; i < rows.length; i++) {
-      if (i === 2) continue; // Skip row 3 (index 2)
-
+      if (i === 2) continue; // skip row 3
       const sheetMilkatId = rows[i][MILKAT_COL_INDEX];
-
-      if (
-        sheetMilkatId !== undefined &&
-        sheetMilkatId !== null &&
-        String(sheetMilkatId).trim() === String(milkatId).trim()
-      ) {
+      if (sheetMilkatId && parseFloat(sheetMilkatId) === parseFloat(milkatId)) {
         rowIndexToUpdate = i;
         break;
       }
@@ -408,8 +373,8 @@ app.post("/update-receipt", async (req, res) => {
 
     if (rowIndexToUpdate !== -1) {
       const rowNumber = rowIndexToUpdate + 1;
-      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`;
-      const dateRange = `${SHEET_NAME}!AG${rowNumber}`;
+      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`; // Column 32
+      const dateRange = `${SHEET_NAME}!AG${rowNumber}`; // Column 33
 
       const today = new Date();
       const formattedDate = `${today.getDate().toString().padStart(2, "0")}/${(
@@ -435,9 +400,7 @@ app.post("/update-receipt", async (req, res) => {
         },
       });
 
-      console.log(
-        `✅ Receipt ${receiptNumber} and date updated at row ${rowNumber}`
-      );
+      console.log(`✅ Receipt ${receiptNumber} updated at row ${rowNumber}`);
       res.status(200).json({
         success: true,
         message: `Receipt and date updated at row ${rowNumber}.`,
@@ -454,73 +417,8 @@ app.post("/update-receipt", async (req, res) => {
   }
 });
 
-// Debug Status Endpoint
-app.get("/debug-status", (req, res) => {
-  res.json({
-    socketInitialized: Boolean(socket),
-    isConnected,
-    googleSheetId: SPREADSheet_ID ? "Configured" : "Not Configured",
-    googleCredentialsConfigured: Boolean(process.env.GOOGLE_CREDENTIALS_JSON),
-    // You can add more checks here, e.g., if JSON parsing successful
-    // isGoogleAuthClientInitialized: Boolean(googleAuthClient),
-  });
-});
-
-// --- WhatsApp Connection Logic ---
-async function connectToWhatsApp() {
-  const { state, saveCreds } = await baileys.useMultiFileAuthState(
-    "auth_info_baileys"
-  );
-  const { version } = await baileys.fetchLatestBaileysVersion();
-
-  socket = baileys.makeWASocket({
-    auth: state,
-    version,
-    browser: ["AF-Infosys", "ReceiptBot", "1.0"],
-  });
-
-  socket.ev.on("creds.update", saveCreds);
-
-  socket.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect, qr } = update;
-
-    if (qr) {
-      console.log("QR Code received, please scan with your phone's WhatsApp:");
-      qrcode.generate(qr, { small: true });
-    }
-
-    if (connection === "close") {
-      isConnected = false;
-      const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode !==
-        baileys.DisconnectReason.loggedOut;
-
-      console.log(
-        "Connection closed. Reason:",
-        lastDisconnect?.error,
-        ". Reconnecting:",
-        shouldReconnect
-      );
-
-      if (shouldReconnect) {
-        connectToWhatsApp();
-      } else {
-        console.log(
-          "❌ Disconnected permanently. You were logged out from WhatsApp."
-        );
-      }
-    } else if (connection === "open") {
-      isConnected = true;
-      console.log(
-        "✅ WhatsApp connection opened successfully! Ready to send receipts."
-      );
-    }
-  });
-}
-
-// Server Start
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  connectToWhatsApp();
-});
+// --- 7. START THE APPLICATION ---
+connectToWhatsApp();
+app.listen(PORT, () =>
+  console.log(`✅ Web server is listening on http://localhost:${PORT}`)
+);
