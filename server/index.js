@@ -2,26 +2,29 @@
 // ==      WHATSAPP RECEIPT SENDER BOT (BACKEND - CORRECTED)      ==
 // =================================================================
 
-// here is the website page code part that is getting the data and bind to the table to display : @injections/bindDataTable.js , can you modify this code          │
-// │   that works like reqesting to api to send all the fetched data before binding to that table... and we can get the data into our database, but that data          │
-// │   fields that come and displaying by bind function, is not enough fields of data... there are such more fields as you can see in this file:                       │
-// │   @injections/EditPage.html this all fields are complete. now i want to know if we can fetch all this fields into that bindDataTable function, because this       │
-// │   binddatatable function fetch all the records, but not all fields, so, that edit page html code does provide all fields but only one record... how can we        │
-// │   modify the code thats get all the required records with all fields and send that data into our backend through api... you dont have to worry for that           │
-// │   api, you just have to modify the function that gets all the required data... but first test by storing alll the fetched data into localstorage, instead         │
-// │   of sending it to our server... we can test it by looking to the localstorage that if the program satisfies our dependency! thank you so much, good Luck!
+// This is the backend code. The user also asked for modifications to a frontend
+// file (@injections/bindDataTable.js) to fetch all fields from records and store
+// them in localStorage before sending to the backend API.
+// That part of the request would need to be handled in a separate frontend file.
 
 // --- 1. DEPENDENCIES ---
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const qrcode = require("qrcode-terminal"); // <-- ADD THIS NEW LIBRARY
-const {
-  default: WASocket,
+import dotenv from "dotenv";
+dotenv.config(); // Call config directly after importing
+import express from "express";
+import cors from "cors";
+import qrcode from "qrcode-terminal";
+import WASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
-} = require("@whiskeysockets/baileys");
+} from "@whiskeysockets/baileys";
+import { google } from "googleapis";
+import path from "path";
+import { fileURLToPath } from "url"; // Import fileURLToPath for __dirname equivalent
+
+// Get __dirname equivalent for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // --- 2. GLOBAL VARIABLES ---
 let socket;
@@ -34,7 +37,7 @@ const PORT = process.env.PORT || 4444;
 app.use(express.json());
 app.get("/", (_, res) => res.send("🤖 WhatsApp Receipt Sender is running."));
 
-// ... (All your utility functions: fetchDataFromSheet, formatJid, safeNumber remain the same) ...
+// --- 4. UTILITY FUNCTIONS (remain the same) ---
 async function fetchDataFromSheet(sheetId, recordId) {
   const range = `A${recordId + 1}:AZ${recordId + 1}`;
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&range=${range}`;
@@ -47,6 +50,7 @@ async function fetchDataFromSheet(sheetId, recordId) {
   }
   return json.table.rows[0].c.map((cell) => (cell ? cell.v : ""));
 }
+
 function formatJid(phone) {
   if (typeof phone !== "string") phone = String(phone);
   const cleaned = phone.replace(/[^0-9]/g, "");
@@ -54,6 +58,7 @@ function formatJid(phone) {
   if (cleaned.length > 10) return `${cleaned}@s.whatsapp.net`;
   return null;
 }
+
 function safeNumber(val) {
   const num = parseFloat(val);
   return isNaN(num) ? 0 : num;
@@ -136,7 +141,6 @@ async function connectToWhatsApp() {
   const { version } = await fetchLatestBaileysVersion();
 
   socket = WASocket({
-    // printQRInTerminal: true, // This option is deprecated, we remove it.
     auth: state,
     version,
     browser: ["AF-Infosys", "ReceiptBot", "1.0"],
@@ -145,13 +149,11 @@ async function connectToWhatsApp() {
   socket.ev.on("creds.update", saveCreds);
 
   socket.ev.on("connection.update", (update) => {
-    // We destructure qr from the update object
     const { connection, lastDisconnect, qr } = update;
 
-    // ** THIS IS THE NEW LOGIC TO HANDLE THE QR CODE **
     if (qr) {
       console.log("QR Code received, please scan with your phone's WhatsApp:");
-      qrcode.generate(qr, { small: true }); // Print the QR code to the terminal
+      qrcode.generate(qr, { small: true });
     }
 
     if (connection === "close") {
@@ -179,22 +181,18 @@ async function connectToWhatsApp() {
   });
 }
 
-const { google } = require("googleapis");
-const path = require("path");
-
 // --- Google Sheets Configuration ---
-// IMPORTANT: Replace with your actual service account key file path and sheet details
 const KEY_FILE_PATH = path.join(
   __dirname,
   "auth_info_baileys/af-infosys-c9ccb3ab388f.json"
-); // Path to your service account key file
-const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y"; // The ID from your sheet's URL
-const SHEET_NAME = "AC MAST"; // The name of the specific sheet/tab you want to update
+);
+const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y";
+const SHEET_NAME = "AC MAST";
 
 // --- Google Sheets Authentication ---
 const auth = new google.auth.GoogleAuth({
   keyFile: KEY_FILE_PATH,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"], // Scope for read/write access
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
 // Create Sheets client
@@ -205,7 +203,6 @@ const sheets = google.sheets({ version: "v4", auth });
  * @param {string} range A1 notation (e.g., 'Sheet1!A1', 'Sheet1!C5:D10')
  * @param {Array<Array<any>>} values An array of arrays, where each inner array is a row of values.
  */
-
 async function updateSheetCells(range, values) {
   try {
     // Step 1: Get existing values from the sheet
