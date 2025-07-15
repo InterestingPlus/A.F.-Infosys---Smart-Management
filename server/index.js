@@ -8,7 +8,7 @@ import qrcode from "qrcode-terminal";
 import * as baileys from "@whiskeysockets/baileys";
 import { google } from "googleapis";
 import path from "path";
-import { fileURLToPath } from "url"; // Corrected import
+import { fileURLToPath } from "url";
 import job from "./cron.js";
 
 dotenv.config();
@@ -24,40 +24,39 @@ app.use(express.json());
 // DB Connection
 connectDB();
 
-// Fix __dirname for ES module (Corrected)
+// Fix __dirname for ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- Google Sheets Configuration ---
-// No longer need KEY_FILE_PATH as we're using env variable
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = "AC MAST";
 
 // --- Google Sheets Authentication (Service Account JSON from Environment Variable) ---
-let googleAuthClient; // Declare a variable to hold the authenticated client
+let googleAuthClient;
 
 try {
-  // Parse the JSON string from the environment variable
+  if (!process.env.GOOGLE_CREDENTIALS_JSON) {
+    throw new Error("GOOGLE_CREDENTIALS_JSON environment variable is not set.");
+  }
   const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
 
   googleAuthClient = new google.auth.GoogleAuth({
-    credentials, // Pass the parsed JSON object directly
+    credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
-
-  // Create Sheets client
-  // Ensure the auth client is ready before creating the sheets client
-  // For production, you might want to await googleAuthClient.getClient() if needed,
-  // but for Sheets API, direct use of GoogleAuth instance usually works for auth.
-  // We'll pass the googleAuthClient instance directly.
 } catch (error) {
-  console.error("❌ Error parsing GOOGLE_CREDENTIALS_JSON or creating GoogleAuth client:", error.message);
-  // Exit the process or handle the error appropriately if credentials are vital
-  process.exit(1);
+  console.error(
+    "❌ Critical Error: Google Sheets authentication failed.",
+    error.message
+  );
+  console.error(
+    "Please ensure GOOGLE_CREDENTIALS_JSON is correctly set and contains valid JSON."
+  );
+  process.exit(1); // Exit if authentication fails
 }
 
 const sheets = google.sheets({ version: "v4", auth: googleAuthClient });
-
 
 // WhatsApp Bot State
 let socket;
@@ -80,7 +79,7 @@ app.use("/api/leads", inquiryRoutes);
  * @returns {Promise<Array<any>>} An array representing the row's cell values.
  */
 async function fetchDataFromSheet(sheetId, recordId) {
-  const range = `${SHEET_NAME}!A${recordId + 1}:AZ${recordId + 1}`; // Assuming recordId is 0-indexed for your logic, adjust to 1-indexed for sheets.
+  const range = `${SHEET_NAME}!A${recordId + 1}:AZ${recordId + 1}`;
 
   try {
     const response = await sheets.spreadsheets.values.get({
@@ -90,12 +89,21 @@ async function fetchDataFromSheet(sheetId, recordId) {
 
     const rows = response.data.values;
     if (!rows || rows.length === 0) {
-      throw new Error(`Record with ID '${recordId}' not found or sheet is empty.`);
+      // If the row exists but is empty, it returns an empty array for values.
+      // If the range is beyond the data, rows will be undefined.
+      console.warn(
+        `No data found for recordId: ${recordId} in range: ${range}`
+      );
+      return []; // Return an empty array if no data is found for the row
     }
-    // Return the first (and only) row's data, mapping null/undefined to empty string for consistency
-    return rows[0].map((cell) => (cell !== undefined && cell !== null ? cell : ""));
+    return rows[0].map((cell) =>
+      cell !== undefined && cell !== null ? cell : ""
+    );
   } catch (error) {
-    console.error(`Error fetching data from sheet (recordId: ${recordId}):`, error.message);
+    console.error(
+      `Error fetching data from sheet (recordId: ${recordId}, range: ${range}):`,
+      error.message
+    );
     throw error;
   }
 }
@@ -107,7 +115,6 @@ async function fetchDataFromSheet(sheetId, recordId) {
  */
 async function updateSheetCells(range, values) {
   try {
-    // Step 1: Get existing values from the sheet to preserve specific cells if needed
     const currentData = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: range,
@@ -115,24 +122,23 @@ async function updateSheetCells(range, values) {
 
     const existingValues = currentData.data.values || [];
 
-    // Step 2: Only preserve value at index 18 if it's empty in the new data
     const finalValues = values.map((row, rowIndex) => {
       const existingRow = existingValues[rowIndex] || [];
-      const updatedRow = [...row]; // clone the row
+      const updatedRow = [...row];
 
-      // If the new data for column 18 (index 18) is empty,
-      // and there's an existing value, preserve the existing one.
-      if ((row[18] === "" || row[18] === undefined || row[18] === null) && existingRow[18] !== undefined) {
+      if (
+        (row[18] === "" || row[18] === undefined || row[18] === null) &&
+        existingRow[18] !== undefined
+      ) {
         updatedRow[18] = existingRow[18];
       }
       return updatedRow;
     });
 
-    // Step 3: Send updated values
     const request = {
       spreadsheetId: SPREADSHEET_ID,
       range: range,
-      valueInputOption: "USER_ENTERED", // This preserves formatting and data types
+      valueInputOption: "USER_ENTERED",
       resource: {
         values: finalValues,
       },
@@ -157,7 +163,7 @@ async function appendSheetRows(values) {
   try {
     const request = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A1`, // Range can be just the sheet name for appending
+      range: `${SHEET_NAME}!A1`,
       valueInputOption: "USER_ENTERED",
       resource: {
         values: values,
@@ -195,22 +201,36 @@ app.post("/send-receipt", async (req, res) => {
   if (!isConnected || !socket) {
     return res.status(503).json({
       success: false,
-      message: "WhatsApp bot is not connected or ready. Please wait or check logs.",
+      message:
+        "WhatsApp bot is not connected or ready. Please wait or check logs.",
     });
   }
 
   const { m_id } = req.body;
   if (!m_id) {
-    return res.status(400).json({ success: false, message: "Missing m_id in request." });
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing m_id in request." });
   }
 
   try {
     const recordId = parseInt(m_id, 10);
     const rowToFetch = recordId + 2; // Adjust for header rows and 1-indexing for sheets
 
-    console.log(`[Request] Received request for m_id: ${m_id}, fetching sheet row: ${rowToFetch}`);
+    console.log(
+      `[Request] Received request for m_id: ${m_id}, fetching sheet row: ${rowToFetch}`
+    );
 
-    const record = await fetchDataFromSheet(process.env.GOOGLE_SHEET_ID, rowToFetch -1); // fetchDataFromSheet expects 0-indexed row number.
+    const record = await fetchDataFromSheet(
+      process.env.GOOGLE_SHEET_ID,
+      rowToFetch - 1
+    ); // fetchDataFromSheet expects 0-indexed row number.
+
+    if (record.length === 0) {
+      throw new Error(
+        `No data found for m_id ${m_id} (sheet row ${rowToFetch}).`
+      );
+    }
 
     const ownerName = record[1] || "Valued Customer";
     const phoneNumber = record[17]; // !! Adjust these indices if your sheet changes !!
@@ -230,7 +250,9 @@ app.post("/send-receipt", async (req, res) => {
     ).toFixed(2);
 
     if (!phoneNumber)
-      throw new Error(`No phone number at index 17 for m_id ${m_id} (sheet row ${rowToFetch})`);
+      throw new Error(
+        `No phone number at index 17 for m_id ${m_id} (sheet row ${rowToFetch})`
+      );
 
     const jid = formatJid(phoneNumber);
     if (!jid) throw new Error(`Invalid phone number format: ${phoneNumber}`);
@@ -255,9 +277,14 @@ app.post("/send-receipt", async (req, res) => {
 
     await socket.sendMessage(jid, buttonMessage);
     console.log(`[Success] Sent receipt for m_id ${m_id} to ${jid}`);
-    res.status(200).json({ success: true, message: `Receipt sent to ${phoneNumber}` });
+    res
+      .status(200)
+      .json({ success: true, message: `Receipt sent to ${phoneNumber}` });
   } catch (error) {
-    console.error(`[Failed] Could not send receipt for m_id ${m_id}:`, error.message);
+    console.error(
+      `[Failed] Could not send receipt for m_id ${m_id}:`,
+      error.message
+    );
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -309,8 +336,8 @@ app.post("/update-sheet-record", async (req, res) => {
     }
 
     if (rowIndexToUpdate !== -1) {
-      const rowNumber = rowIndexToUpdate + 1; // Google Sheets is 1-indexed
-      const rangeToUpdate = `${SHEET_NAME}!A${rowNumber}`; // Update the entire row starting from column A
+      const rowNumber = rowIndexToUpdate + 1;
+      const rangeToUpdate = `${SHEET_NAME}!A${rowNumber}`;
 
       console.log(
         `[DEBUG] Updating sheet at row number: ${rowNumber}, range: ${rangeToUpdate}`
@@ -324,7 +351,6 @@ app.post("/update-sheet-record", async (req, res) => {
         message: `Record for Milkat ID ${milkatId} updated.`,
       });
     } else {
-      // If not found, append as a new row
       await appendSheetRows([rowData]);
       console.log(`Milkat ${milkatId} record not found, appended as new row.`);
       res.status(200).json({
@@ -333,7 +359,10 @@ app.post("/update-sheet-record", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("[Failed] Could not update/append data to sheet:", error.message);
+    console.error(
+      "[Failed] Could not update/append data to sheet:",
+      error.message
+    );
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -352,13 +381,13 @@ app.post("/update-receipt", async (req, res) => {
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:AZ`, // Read a wide enough range
+      range: `${SHEET_NAME}!A:AZ`,
     };
 
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
     const rows = getResponse.data.values || [];
 
-    const MILKAT_COL_INDEX = 5; // Assuming Milkat Number is in column 6 (index 5)
+    const MILKAT_COL_INDEX = 5;
 
     let rowIndexToUpdate = -1;
 
@@ -378,19 +407,21 @@ app.post("/update-receipt", async (req, res) => {
     }
 
     if (rowIndexToUpdate !== -1) {
-      const rowNumber = rowIndexToUpdate + 1; // Google Sheets is 1-indexed
-      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`; // Column AF (32nd column, index 31)
-      const dateRange = `${SHEET_NAME}!AG${rowNumber}`; // Column AG (33rd column, index 32)
+      const rowNumber = rowIndexToUpdate + 1;
+      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`;
+      const dateRange = `${SHEET_NAME}!AG${rowNumber}`;
 
       const today = new Date();
       const formattedDate = `${today.getDate().toString().padStart(2, "0")}/${(
         today.getMonth() + 1
-      ).toString().padStart(2, "0")}/${today.getFullYear()}`;
+      )
+        .toString()
+        .padStart(2, "0")}/${today.getFullYear()}`;
 
       await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: SPREADSHEET_ID,
         requestBody: {
-          valueInputOption: "RAW", // Use RAW to insert values as-is
+          valueInputOption: "RAW",
           data: [
             {
               range: receiptRange,
@@ -404,7 +435,9 @@ app.post("/update-receipt", async (req, res) => {
         },
       });
 
-      console.log(`✅ Receipt ${receiptNumber} and date updated at row ${rowNumber}`);
+      console.log(
+        `✅ Receipt ${receiptNumber} and date updated at row ${rowNumber}`
+      );
       res.status(200).json({
         success: true,
         message: `Receipt and date updated at row ${rowNumber}.`,
@@ -426,9 +459,10 @@ app.get("/debug-status", (req, res) => {
   res.json({
     socketInitialized: Boolean(socket),
     isConnected,
-    googleSheetId: SPREADSHEET_ID ? "Configured" : "Not Configured",
+    googleSheetId: SPREADSheet_ID ? "Configured" : "Not Configured",
     googleCredentialsConfigured: Boolean(process.env.GOOGLE_CREDENTIALS_JSON),
-    // Removed keyFilePath and keyFileExists as we are not using the file method
+    // You can add more checks here, e.g., if JSON parsing successful
+    // isGoogleAuthClientInitialized: Boolean(googleAuthClient),
   });
 });
 
@@ -458,7 +492,8 @@ async function connectToWhatsApp() {
     if (connection === "close") {
       isConnected = false;
       const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode !== baileys.DisconnectReason.loggedOut;
+        lastDisconnect?.error?.output?.statusCode !==
+        baileys.DisconnectReason.loggedOut;
 
       console.log(
         "Connection closed. Reason:",
@@ -470,7 +505,9 @@ async function connectToWhatsApp() {
       if (shouldReconnect) {
         connectToWhatsApp();
       } else {
-        console.log("❌ Disconnected permanently. You were logged out from WhatsApp.");
+        console.log(
+          "❌ Disconnected permanently. You were logged out from WhatsApp."
+        );
       }
     } else if (connection === "open") {
       isConnected = true;
@@ -485,5 +522,5 @@ async function connectToWhatsApp() {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  connectToWhatsApp(); // Call the function to connect to WhatsApp after the server starts
+  connectToWhatsApp();
 });
