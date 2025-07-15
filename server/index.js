@@ -1,23 +1,30 @@
- 
+// =================================================================
+// ==      WHATSAPP RECEIPT SENDER BOT (BACKEND - CORRECTED)      ==
+// =================================================================
+
+// This is the backend code. The user also asked for modifications to a frontend
+// file (@injections/bindDataTable.js) to fetch all fields from records and store
+// them in localStorage before sending to the backend API.
+// That part of the request would need to be handled in a separate frontend file.
+
 // --- 1. DEPENDENCIES ---
 import dotenv from "dotenv";
 dotenv.config(); // Call config directly after importing
 import express from "express";
 import cors from "cors";
 import qrcode from "qrcode-terminal";
-// Corrected import: Use makeWASocket as the function to create the WA socket
 import {
-  makeWASocket, // Corrected import
+  makeWASocket,
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
 } from "@whiskeysockets/baileys";
 import { google } from "googleapis";
 import path from "path";
-import { fileURLToPath } from "url"; // Import fileURLToPath for __dirname equivalent
+import { fileURLToPath } from "url"; // Corrected import
 
 // Get __dirname equivalent for ES Modules
-const __filename = fileURLURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url); // Corrected typo here
 const __dirname = path.dirname(__filename);
 
 // --- 2. GLOBAL VARIABLES ---
@@ -129,12 +136,11 @@ app.post("/send-receipt", async (req, res) => {
   }
 });
 
-// --- 6. WHATSAPP CONNECTION LOGIC (THIS IS THE UPDATED PART) ---
+// --- 6. WHATSAPP CONNECTION LOGIC ---
 async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
   const { version } = await fetchLatestBaileysVersion();
 
-  // Corrected usage: makeWASocket is the function to call
   socket = makeWASocket({
     auth: state,
     version,
@@ -177,18 +183,26 @@ async function connectToWhatsApp() {
 }
 
 // --- Google Sheets Configuration ---
-const KEY_FILE_PATH = path.join(
-  __dirname,
-  "auth_info_baileys/af-infosys-c9ccb3ab388f.json"
-);
+// Removed KEY_FILE_PATH, as we'll use an environment variable
 const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y";
 const SHEET_NAME = "AC MAST";
 
 // --- Google Sheets Authentication ---
-const auth = new google.auth.GoogleAuth({
-  keyFile: KEY_FILE_PATH,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
+let auth;
+try {
+  // Parse the JSON string from the environment variable
+  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  console.log("✅ Google Sheets authentication credentials loaded from environment.");
+} catch (error) {
+  console.error("❌ Error parsing Google credentials from GOOGLE_CREDENTIALS_JSON:", error.message);
+  console.error("Please ensure GOOGLE_CREDENTIALS_JSON is set correctly and is valid JSON.");
+  process.exit(1); // Exit the process if credentials cannot be loaded
+}
+
 
 // Create Sheets client
 const sheets = google.sheets({ version: "v4", auth });
