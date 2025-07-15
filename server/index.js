@@ -1,19 +1,13 @@
-// =================================================================
-// ==      WHATSAPP RECEIPT SENDER BOT (BACKEND - CORRECTED)      ==
-// =================================================================
-
-// This is the backend code. The user also asked for modifications to a frontend
-// file (@injections/bindDataTable.js) to fetch all fields from records and store
-// them in localStorage before sending to the backend API.
-// That part of the request would need to be handled in a separate frontend file.
-
+ 
 // --- 1. DEPENDENCIES ---
 import dotenv from "dotenv";
 dotenv.config(); // Call config directly after importing
 import express from "express";
 import cors from "cors";
 import qrcode from "qrcode-terminal";
-import WASocket, {
+// Corrected import: Use makeWASocket as the function to create the WA socket
+import {
+  makeWASocket, // Corrected import
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
@@ -23,7 +17,7 @@ import path from "path";
 import { fileURLToPath } from "url"; // Import fileURLToPath for __dirname equivalent
 
 // Get __dirname equivalent for ES Modules
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- 2. GLOBAL VARIABLES ---
@@ -140,7 +134,8 @@ async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
   const { version } = await fetchLatestBaileysVersion();
 
-  socket = WASocket({
+  // Corrected usage: makeWASocket is the function to call
+  socket = makeWASocket({
     auth: state,
     version,
     browser: ["AF-Infosys", "ReceiptBot", "1.0"],
