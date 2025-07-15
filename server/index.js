@@ -8,8 +8,8 @@ import qrcode from "qrcode-terminal";
 import * as baileys from "@whiskeysockets/baileys";
 import { google } from "googleapis";
 import path from "path";
-import { fileURLToPath } from "url";
-import job from "./cron.js"; // Assuming this is for your cron job setup
+import { fileURLToPath } from "url"; // Corrected import
+import job from "./cron.js";
 
 dotenv.config();
 
@@ -24,23 +24,40 @@ app.use(express.json());
 // DB Connection
 connectDB();
 
-// Fix __dirname for ES module
-const __filename = fileURLToURL(import.meta.url);
+// Fix __dirname for ES module (Corrected)
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- Google Sheets Configuration ---
-const KEY_FILE_PATH = path.join(__dirname, "af-infosys-c9ccb3ab388f.json"); // Path to your service account key file
-const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID; // Make sure GOOGLE_SHEET_ID is in your .env or Render env vars
-const SHEET_NAME = "AC MAST"; // The name of the specific sheet/tab you want to update
+// No longer need KEY_FILE_PATH as we're using env variable
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
+const SHEET_NAME = "AC MAST";
 
-// --- Google Sheets Authentication (Service Account) ---
-const auth = new google.auth.GoogleAuth({
-  keyFile: KEY_FILE_PATH,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"], // Scope for read/write access
-});
+// --- Google Sheets Authentication (Service Account JSON from Environment Variable) ---
+let googleAuthClient; // Declare a variable to hold the authenticated client
 
-// Create Sheets client
-const sheets = google.sheets({ version: "v4", auth });
+try {
+  // Parse the JSON string from the environment variable
+  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+
+  googleAuthClient = new google.auth.GoogleAuth({
+    credentials, // Pass the parsed JSON object directly
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  // Create Sheets client
+  // Ensure the auth client is ready before creating the sheets client
+  // For production, you might want to await googleAuthClient.getClient() if needed,
+  // but for Sheets API, direct use of GoogleAuth instance usually works for auth.
+  // We'll pass the googleAuthClient instance directly.
+} catch (error) {
+  console.error("❌ Error parsing GOOGLE_CREDENTIALS_JSON or creating GoogleAuth client:", error.message);
+  // Exit the process or handle the error appropriately if credentials are vital
+  process.exit(1);
+}
+
+const sheets = google.sheets({ version: "v4", auth: googleAuthClient });
+
 
 // WhatsApp Bot State
 let socket;
@@ -188,15 +205,8 @@ app.post("/send-receipt", async (req, res) => {
   }
 
   try {
-    const recordId = parseInt(m_id, 10); // Assuming m_id is 0-indexed from your client if you add 2 later.
-    // If m_id from the client is already 1-indexed (e.g., row number from sheet), then just use recordId directly.
-    // Based on your original code `parseInt(m_id, 10) + 2`, it seems your `m_id` is 0-indexed relative to some data structure,
-    // and you want to fetch the corresponding row in Google Sheets, skipping header rows.
-    // Let's assume `recordId` here should correspond directly to the row number in `fetchDataFromSheet`'s `A${recordId + 1}`.
-    // If m_id is the actual row number (1-indexed) in the sheet, then use `const sheetRowNumber = parseInt(m_id, 10);`
-    // and pass `sheetRowNumber - 1` to `fetchDataFromSheet` if it expects 0-indexed.
-    // For consistency with original code, let's keep `recordId + 2` for `fetchDataFromSheet` internally.
-    const rowToFetch = recordId + 2; // Assuming m_id is an index that needs to be offset by 2 for the sheet row number
+    const recordId = parseInt(m_id, 10);
+    const rowToFetch = recordId + 2; // Adjust for header rows and 1-indexing for sheets
 
     console.log(`[Request] Received request for m_id: ${m_id}, fetching sheet row: ${rowToFetch}`);
 
@@ -225,7 +235,7 @@ app.post("/send-receipt", async (req, res) => {
     const jid = formatJid(phoneNumber);
     if (!jid) throw new Error(`Invalid phone number format: ${phoneNumber}`);
 
-    const receiptUrl = `https://afinfosys.netlify.app/reciept_format.html?m_id=${m_id}`; // Ensure this URL is correct and accessible
+    const receiptUrl = `https://afinfosys.netlify.app/reciept_format.html?m_id=${m_id}`;
 
     const messageText = `નમસ્તે ${ownerName},\n\nતમારી ગ્રામ પંચાયતની રસીદ તૈયાર છે. કુલ રકમ ₹${totalAmount} છે.\n\nનીચે આપેલા બટન પર ક્લિક કરીને તમારી રસીદ જુઓ અને ચુકવણી કરો.\n${receiptUrl}\n\nઆભાર,\nગ્રામ પંચાયત`;
 
@@ -266,13 +276,13 @@ app.post("/update-sheet-record", async (req, res) => {
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:AZ`, // Read a large enough range to cover your data
+      range: `${SHEET_NAME}!A:AZ`,
     };
 
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
-    const rows = getResponse.data.values || []; // Ensure rows is an array, even if empty
+    const rows = getResponse.data.values || [];
 
-    const MILKAT_COL_INDEX = 5; // Assuming Milkat Number is in the 6th column (index 5, 0-indexed)
+    const MILKAT_COL_INDEX = 5;
 
     let rowIndexToUpdate = -1;
 
@@ -287,8 +297,6 @@ app.post("/update-sheet-record", async (req, res) => {
         `[DEBUG] Checking row ${i}, Milkat ID in sheet: ${sheetMilkatId}`
       );
 
-      // Robust comparison: convert both to string and then compare, or handle parseFloat carefully.
-      // Assuming milkatId can be a number or string, and in sheet it might be stored as string or number.
       if (
         sheetMilkatId !== undefined &&
         sheetMilkatId !== null &&
@@ -419,8 +427,8 @@ app.get("/debug-status", (req, res) => {
     socketInitialized: Boolean(socket),
     isConnected,
     googleSheetId: SPREADSHEET_ID ? "Configured" : "Not Configured",
-    keyFilePath: KEY_FILE_PATH,
-    keyFileExists: require("fs").existsSync(KEY_FILE_PATH), // Check if file exists for debugging
+    googleCredentialsConfigured: Boolean(process.env.GOOGLE_CREDENTIALS_JSON),
+    // Removed keyFilePath and keyFileExists as we are not using the file method
   });
 });
 
