@@ -1,15 +1,5 @@
-// =================================================================
-// ==      WHATSAPP RECEIPT SENDER BOT (BACKEND - CORRECTED)      ==
-// =================================================================
-
-// This is the backend code. The user also asked for modifications to a frontend
-// file (@injections/bindDataTable.js) to fetch all fields from records and store
-// them in localStorage before sending to the backend API.
-// That part of the request would need to be handled in a separate frontend file.
-
 // --- 1. DEPENDENCIES ---
-import dotenv from "dotenv";
-dotenv.config(); // Call config directly after importing
+import { configDotenv } from "dotenv";
 import express from "express";
 import cors from "cors";
 import qrcode from "qrcode-terminal";
@@ -20,12 +10,13 @@ import {
   fetchLatestBaileysVersion,
 } from "@whiskeysockets/baileys";
 import { google } from "googleapis";
-import path from "path";
-import { fileURLToPath } from "url"; // Corrected import
 
-// Get __dirname equivalent for ES Modules
-const __filename = fileURLToPath(import.meta.url); // Corrected typo here
-const __dirname = path.dirname(__filename);
+// No longer need 'path' or 'url' if not reading from file
+// import path from "path";
+// import { fileURLToPath } from "url";
+
+// Load environment variables from .env file
+configDotenv();
 
 // --- 2. GLOBAL VARIABLES ---
 let socket;
@@ -38,7 +29,64 @@ const PORT = process.env.PORT || 4444;
 app.use(express.json());
 app.get("/", (_, res) => res.send("🤖 WhatsApp Receipt Sender is running."));
 
+// --- Google Sheets Configuration ---
+// Get SPREADSHEET_ID from environment variable
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
+const SHEET_NAME = "AC MAST"; // The name of the specific sheet/tab you want to update
+
+// --- Google Sheets Authentication ---
+let auth;
+let sheets; // Declare sheets here to make it accessible globally
+
+try {
+  // Ensure GOOGLE_CREDENTIALS_JSON is set
+  if (!process.env.GOOGLE_CREDENTIALS_JSON) {
+    throw new Error("GOOGLE_CREDENTIALS_JSON environment variable is not set.");
+  }
+
+  // Parse the JSON string from the environment variable
+  const rawCredentialsString = process.env.GOOGLE_CREDENTIALS_JSON;
+  let credentials = JSON.parse(rawCredentialsString);
+
+  // CRITICAL FIX: Replace escaped newlines with actual newlines in the private_key
+  if (credentials.private_key) {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+  } else {
+    // Optionally handle if private_key is missing, though JSON.parse should fail earlier
+    throw new Error("Private key missing in Google credentials JSON.");
+  }
+
+  // Log to confirm successful parsing and newline fix (for debugging)
+  console.log("✅ Google Sheets credentials successfully parsed and formatted.");
+  // console.log("Parsed Credentials (careful with sensitive data):", credentials); // Uncomment for deep debug
+
+  auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"], // Scope for read/write access
+  });
+
+  // Create Sheets client here, after auth is established
+  sheets = google.sheets({ version: "v4", auth });
+
+  console.log("✅ Google Sheets authentication client initialized.");
+} catch (error) {
+  console.error("❌ Fatal Error: Could not initialize Google Sheets API.");
+  console.error(
+    "Reason:",
+    error.message.includes("Unexpected token")
+      ? "Invalid JSON format in GOOGLE_CREDENTIALS_JSON."
+      : error.message
+  );
+  console.error(
+    "Please ensure GOOGLE_CREDENTIALS_JSON is set correctly and is valid JSON."
+  );
+  process.exit(1); // Exit the process if credentials cannot be loaded
+}
+
 // --- 4. UTILITY FUNCTIONS (remain the same) ---
+// Ensure the fetchDataFromSheet uses the global 'sheets' client if you intend it to use service account auth
+// rather than making a direct public GViz URL request. If GViz is intended, keep it as is.
+// For now, I'm assuming GViz URL is a separate mechanism and leaving it as is.
 async function fetchDataFromSheet(sheetId, recordId) {
   const range = `A${recordId + 1}:AZ${recordId + 1}`;
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&range=${range}`;
@@ -182,31 +230,6 @@ async function connectToWhatsApp() {
   });
 }
 
-// --- Google Sheets Configuration ---
-// Removed KEY_FILE_PATH, as we'll use an environment variable
-const SPREADSHEET_ID = "1_bs5IQ0kDT_xVLwJdihe17yuyY_UfJRKCtwoGvO7T5Y";
-const SHEET_NAME = "AC MAST";
-
-// --- Google Sheets Authentication ---
-let auth;
-try {
-  // Parse the JSON string from the environment variable
-  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-  auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-  console.log("✅ Google Sheets authentication credentials loaded from environment.");
-} catch (error) {
-  console.error("❌ Error parsing Google credentials from GOOGLE_CREDENTIALS_JSON:", error.message);
-  console.error("Please ensure GOOGLE_CREDENTIALS_JSON is set correctly and is valid JSON.");
-  process.exit(1); // Exit the process if credentials cannot be loaded
-}
-
-
-// Create Sheets client
-const sheets = google.sheets({ version: "v4", auth });
-
 /**
  * Updates a specific range of cells in a Google Sheet.
  * @param {string} range A1 notation (e.g., 'Sheet1!A1', 'Sheet1!C5:D10')
@@ -227,7 +250,8 @@ async function updateSheetCells(range, values) {
       const existingRow = existingValues[rowIndex] || [];
       const updatedRow = [...row]; // clone the row
 
-      if (row[18] === "") {
+      if (row[18] === "" || row[18] === undefined || row[18] === null) {
+        // Ensure it's explicitly empty or null/undefined
         updatedRow[18] = existingRow[18] ?? "Meghraj - MEGHRAJ"; // preserve existing if available
       }
 
@@ -289,12 +313,12 @@ app.post("/update-sheet-record", async (req, res) => {
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:Z`, // Read a large enough range to cover your data
+      range: `${SHEET_NAME}!A:AZ`, // Expanded range to AZ to fetch more columns
     };
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
     const rows = getResponse.data.values;
 
-    const MILKAT_COL_INDEX = 5; // Assuming Milkat Number is in the first column (index 0)
+    const MILKAT_COL_INDEX = 5; // Assuming Milkat Number is in column F (index 5)
 
     let rowIndexToUpdate = -1;
     console.log(`[DEBUG] Received milkatId for update: ${milkatId}`);
@@ -346,7 +370,10 @@ app.post("/update-sheet-record", async (req, res) => {
   }
 });
 
-// Reciept Number Updation on Record
+// Reciept Number Updation on Record (duplicate endpoint - consider merging or renaming)
+// This endpoint is duplicated from the original code. I recommend reviewing if it's still needed
+// or if its functionality can be merged into `/update-sheet-record`.
+// For now, I'm keeping it as is, but flagged for review.
 app.post("/update-receipt", async (req, res) => {
   const { milkatId, receiptNumber } = req.body;
 
@@ -360,16 +387,16 @@ app.post("/update-receipt", async (req, res) => {
   try {
     const getRequest = {
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:Z`,
+      range: `${SHEET_NAME}!A:AZ`, // Expanded range to AZ to get all possible data
     };
     const getResponse = await sheets.spreadsheets.values.get(getRequest);
     const rows = getResponse.data.values;
 
-    const MILKAT_COL_INDEX = 5;
+    const MILKAT_COL_INDEX = 5; // Column F (0-indexed)
     let rowIndexToUpdate = -1;
 
     for (let i = 0; i < rows.length; i++) {
-      if (i === 2) continue; // skip row 3
+      if (i === 2) continue; // skip row 3 (index 2)
       const sheetMilkatId = rows[i][MILKAT_COL_INDEX];
       if (sheetMilkatId && parseFloat(sheetMilkatId) === parseFloat(milkatId)) {
         rowIndexToUpdate = i;
@@ -379,13 +406,14 @@ app.post("/update-receipt", async (req, res) => {
 
     if (rowIndexToUpdate !== -1) {
       const rowNumber = rowIndexToUpdate + 1;
-      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`; // Column 32
-      const dateRange = `${SHEET_NAME}!AG${rowNumber}`; // Column 33
+      const receiptRange = `${SHEET_NAME}!AF${rowNumber}`; // Column 32 (AF)
+      const dateRange = `${SHEET_NAME}!AG${rowNumber}`; // Column 33 (AG)
 
       const today = new Date();
+      // Format date as DD/MM/YYYY
       const formattedDate = `${today.getDate().toString().padStart(2, "0")}/${(
         today.getMonth() + 1
-      )
+      ) // Month is 0-indexed
         .toString()
         .padStart(2, "0")}/${today.getFullYear()}`;
 
@@ -406,7 +434,7 @@ app.post("/update-receipt", async (req, res) => {
         },
       });
 
-      console.log(`✅ Receipt ${receiptNumber} updated at row ${rowNumber}`);
+      console.log(`✅ Receipt ${receiptNumber} and Date updated at row ${rowNumber}`);
       res.status(200).json({
         success: true,
         message: `Receipt and date updated at row ${rowNumber}.`,
@@ -422,6 +450,40 @@ app.post("/update-receipt", async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+
+// --- NEW ENDPOINT TO FETCH ALL DATA WITH ALL FIELDS ---
+// This new endpoint will read all records from the sheet and
+// return them. The frontend (@injections/bindDataTable.js) will
+// then fetch this data, store it in localStorage, and then
+// bind it to the table.
+app.get("/get-all-sheet-data", async (req, res) => {
+  try {
+    const getRequest = {
+      spreadsheetId: SPREADSHEET_ID,
+      // Fetch a very wide range to ensure all possible columns (fields) are included.
+      // Assuming 'AZ' covers all fields from EditPage.html
+      range: `${SHEET_NAME}!A:AZ`,
+    };
+
+    const getResponse = await sheets.spreadsheets.values.get(getRequest);
+    const allRows = getResponse.data.values || [];
+
+    // Filter out the third row (index 2) if it's meant to be skipped in general data retrieval
+    const filteredRows = allRows.filter((_, index) => index !== 2);
+
+    console.log(`✅ Fetched ${filteredRows.length} rows from sheet.`);
+    res.status(200).json({
+      success: true,
+      data: filteredRows,
+      message: `Successfully fetched all data from ${SHEET_NAME}.`,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching all sheet data:", error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 // --- 7. START THE APPLICATION ---
 connectToWhatsApp();
